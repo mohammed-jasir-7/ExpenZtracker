@@ -33,7 +33,7 @@ class HomePieChart extends StatelessWidget {
                       builder: (context, value, child) {
                         return totalAmountExpense.value <= 0
                             ? CustomText(
-                                content: "Good work sir!",
+                                content: "Data not found!",
                                 fontname: 'Poppins',
                                 weight: FontWeight.w600,
                               )

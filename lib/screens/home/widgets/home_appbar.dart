@@ -65,7 +65,9 @@ class HomeAppBar extends StatelessWidget {
     );
   }
 }
+
 //===================================================== app bar end here ====================================================
+ValueNotifier<List<Transaction>> transaction = ValueNotifier([]);
 
 //=====================================================search bar ================================================================
 class MysearchDelegate extends SearchDelegate {
@@ -97,13 +99,21 @@ class MysearchDelegate extends SearchDelegate {
       icon: const Icon(Icons.arrow_back));
 
   @override
-  Widget buildResults(BuildContext context) => const Text("jjj");
+  Widget buildResults(BuildContext context) {
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   List<Transaction> get = searchFilter(query);
+    //   transaction.value.addAll(get);
+    //   transaction.notifyListeners();
+    // });
+    return Text("data");
+  }
+
   @override
   Widget buildSuggestions(BuildContext context) {
-    ValueNotifier<List<Transaction>> transaction = ValueNotifier([]);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (query.isNotEmpty) {
         List<Transaction> get = searchFilter(query);
+        transaction.value.clear();
         transaction.value.addAll(get);
         transaction.notifyListeners();
       }

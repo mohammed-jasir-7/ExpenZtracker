@@ -1,10 +1,10 @@
 import 'package:expenztracker/Database/DB%20function/db_function.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:expenztracker/screens/home/widgets/home_appbar.dart';
+import 'package:expenztracker/screens/home/widgets/home_piechart.dart';
+import 'package:expenztracker/screens/insight/widgets/first_card.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 import '../../Database/model/model_transaction.dart';
 
@@ -20,55 +20,70 @@ class InsightScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-//=============================app bar ==========================================
+//=============================  app bar =========================================
       appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: HomeAppBar(leadingIcon: false)),
-//===============================================================================
+//==============================================================================
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-                padding: const EdgeInsets.only(left: 30),
-                //===== filter buttton ==
-                child: Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        bottomSheet(context);
-                      },
-                      child: CustomText(content: "Last 30 Days "),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        insightFilter();
-                      },
-                      child: CustomText(content: "Last year"),
-                    ),
-                    TextButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blue[100]),
-                      ),
-                      onPressed: () {
-                        bottomSheet(context);
-                      },
-                      child: CustomText(content: "Last week"),
-                    ),
-                  ],
-                )),
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-//=======line graph =========
-              child:
-                  SizedBox(width: size.width, height: 300, child: Linechartt()),
-            )
-          ],
+        child: Padding(
+          padding: const EdgeInsets.only(top: 13, left: 15, right: 15),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CardOne(), // overview
+                const Divider(
+                  thickness: 3,
+                ),
+                HomePieChart(), //piechart
+//buttons
+                Padding(
+                    padding: const EdgeInsets.only(left: 30),
+                    //===== filter buttton ==
+                    child: Row(
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            bottomSheet(context);
+                          },
+                          child: CustomText(content: "Last 30 Days "),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            insightFilter();
+                          },
+                          child: CustomText(content: "Last year"),
+                        ),
+                        TextButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.blue[100]),
+                          ),
+                          onPressed: () {
+                            bottomSheet(context);
+                          },
+                          child: CustomText(content: "Last week"),
+                        ),
+                      ],
+                    )),
+                //================================================= line chart =======================================================
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  //=======line graph =========
+                  child: SizedBox(
+                      width: size.width, height: 300, child: Linechartt()),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+
+  // date picker ======== function=============================
 
   bottomSheet(BuildContext context) async {
     daterange.value = await showDateRangePicker(
@@ -76,18 +91,21 @@ class InsightScreen extends StatelessWidget {
   }
 }
 
+// line graph widget=====================================
 class Linechartt extends StatelessWidget {
   final List<Color> incomeGradiant = [
-    Color.fromARGB(255, 111, 248, 6),
-    Color.fromARGB(255, 69, 208, 4)
+    const Color.fromARGB(255, 111, 248, 6),
+    const Color.fromARGB(255, 69, 208, 4)
   ];
   Linechartt({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      LineChart(Experiment.getLinechartData());
+  Widget build(BuildContext context) => LineChart(
+      Experiment.getLinechartData()); // this function return Line chart data
 }
 
+//=====================================================================
+//======================= getTitledata() return titles=========================
 class LineTitles {
   static getTitleData() => FlTitlesData(
       show: true,
@@ -106,21 +124,42 @@ class LineTitles {
               return Text("feb");
             case 3:
               return Text("mar");
+            case 4:
+              return Text("Apr");
+            case 5:
+              return Text("may");
+            case 6:
+              return Text("Jun");
+            case 7:
+              return Text("Jul");
+            case 8:
+              return Text("aug");
+            case 9:
+              return Text("sep");
+            case 10:
+              return Text("oct");
+            case 11:
+              return Text("nov");
+            case 10:
+              return Text("dec");
           }
-          return Text("null");
+          return Text("");
         },
       )));
 }
+//==============================================================================================================
 
 ValueNotifier<List<Transaction>> linchartTransaction = ValueNotifier([]);
 
+// ======================== return linechart data ============================================
+//
 class Experiment {
   static LineChartData getLinechartData() {
     return LineChartData(
         lineTouchData: LineTouchData(),
-        backgroundColor: Color.fromARGB(255, 230, 230, 230),
+        backgroundColor: const Color.fromARGB(255, 230, 230, 230),
         titlesData: LineTitles.getTitleData(),
-        minX: 0,
+        minX: 1,
         maxX: 12,
         minY: 0,
         maxY: totalAmountExpense.value,
@@ -183,14 +222,26 @@ insightFilter() async {
     if (element.categoryType == CategoryType.expense) {
       print(monthly.entries);
       switch (element.date.month) {
-        case 12:
+        case 1:
           print(element.amount);
-          monthly.update(12, (value) => value + element.amount);
+          monthly.update(1, (value) => value + element.amount);
           print(monthly.entries);
           break;
 
         case 2:
           monthly.update(2, (value) => value + element.amount);
+          break;
+        case 3:
+          monthly.update(3, (value) => value + element.amount);
+          break;
+        case 4:
+          monthly.update(4, (value) => value + element.amount);
+          break;
+        case 5:
+          monthly.update(5, (value) => value + element.amount);
+          break;
+        case 6:
+          monthly.update(6, (value) => value + element.amount);
           break;
       }
     }
