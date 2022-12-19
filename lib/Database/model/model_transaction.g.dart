@@ -98,6 +98,48 @@ class CategoryAdapter extends TypeAdapter<Category> {
           typeId == other.typeId;
 }
 
+class PlannerAdapter extends TypeAdapter<Planner> {
+  @override
+  final int typeId = 4;
+
+  @override
+  Planner read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Planner(
+      start: fields[1] as DateTime,
+      end: fields[2] as DateTime,
+      budget: (fields[3] as List)
+          .map((dynamic e) => (e as Map).cast<Category, int>())
+          .toList(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Planner obj) {
+    writer
+      ..writeByte(3)
+      ..writeByte(1)
+      ..write(obj.start)
+      ..writeByte(2)
+      ..write(obj.end)
+      ..writeByte(3)
+      ..write(obj.budget);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlannerAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class CategoryTypeAdapter extends TypeAdapter<CategoryType> {
   @override
   final int typeId = 3;

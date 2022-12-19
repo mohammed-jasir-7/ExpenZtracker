@@ -3,7 +3,7 @@ import 'package:expenztracker/Database/model/model_transaction.dart';
 import 'package:expenztracker/screens/splashscreen.dart';
 import 'package:flutter/material.dart';
 
-void main(List<String> args) async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dataBase();

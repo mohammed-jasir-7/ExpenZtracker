@@ -1,5 +1,6 @@
 import 'package:expenztracker/custom%20WIDGETS/custom_route.dart';
 import 'package:expenztracker/screens/insight/insight_screen.dart';
+import 'package:expenztracker/screens/planner/planner_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -21,6 +22,7 @@ class DrawerScreen extends StatelessWidget {
             message: 'Insight',
             child: IconButton(
               onPressed: () {
+// navigation to insights screen ===========================================================================
                 Navigator.push(
                     context, CustomPageRoute(child: const InsightScreen()));
               },
@@ -31,7 +33,10 @@ class DrawerScreen extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+// navigate to planner========================================================================
+              Navigator.push(context, CustomPageRoute(child: PlannerScreen()));
+            },
             icon: Icon(Icons.schedule, size: 40),
           ),
           IconButton(

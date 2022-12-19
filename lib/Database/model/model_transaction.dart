@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 part 'model_transaction.g.dart';
 
@@ -60,4 +61,15 @@ class Category extends HiveObject {
   });
 }
 
-//===========================================================================================================================
+//============================================== planner model =============================================================================
+@HiveType(typeId: 4)
+class Planner extends HiveObject {
+  @HiveField(1)
+  final DateTime start;
+  @HiveField(2)
+  final DateTime end;
+  @HiveField(3)
+  final List<Map<Category, int>> budget;
+
+  Planner({required this.start, required this.end, required this.budget});
+}

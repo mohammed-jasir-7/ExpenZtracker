@@ -228,7 +228,9 @@ class CategoryButton extends StatelessWidget {
                 Container(
                   child: imagePath == null
                       ? Icon(
-                          IconData(icon, fontFamily: 'MaterialIcons'),
+                          IconData(
+                            icon,
+                          ),
                           color: Color(4245594959),
                         )
                       : Image.asset(imagePath!),

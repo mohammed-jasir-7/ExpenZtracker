@@ -1,15 +1,30 @@
 import 'package:expenztracker/Database/model/model_transaction.dart';
+import 'package:expenztracker/screens/planner/planner_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 
-// four lists
-
+//============================list of all income & expense ===============================================
+//add data when call getatransaction()
 ValueNotifier<List<Transaction>> incomeList = ValueNotifier([]);
 ValueNotifier<List<Transaction>> expenseList = ValueNotifier([]);
-ValueNotifier<List<Categoryawise>> totalCategorywiseList = ValueNotifier([]);
+//=============================================================================
+//===== value add when call getTransaction()  =================================================================
+//total amount of income and expense
 ValueNotifier<double> totalAmountIncome = ValueNotifier(0);
 ValueNotifier<double> totalAmountExpense = ValueNotifier(0);
+//=============================================================================
+//======================value add when call getCategoryWiseData()===================================
+//include category name and total
+ValueNotifier<List<Categoryawise>> categoryWiseTotalAmount = ValueNotifier([]);
+ValueNotifier<List<Categoryawise>> categoryExpenseWiseTotalAmount =
+    ValueNotifier([]);
+//=================================================================
+//======================value add when call categoryFilter()===================================
+//category name & transaction which under name
+ValueNotifier<Map<String, List<Transaction>>> map = ValueNotifier({});
+//===============================================================
+ValueNotifier<List<Categoryawise>> datewiseplanner = ValueNotifier([]);
 
 //this class used to get database box
 //use these function getTransaction return transaction box
@@ -27,8 +42,10 @@ class Boxes {
     for (var element in listOfTransaction) {
       if (element.categoryType == CategoryType.income) {
         //add values to income List
-        incomeList.value.add(element);
-        //add total amount of income
+
+        incomeList.value.add(
+            element); //=================================output to IncomeList
+        //add total amount of income to valueNotifier totalAmountIncome=================output
         totalAmountIncome.value += element.amount;
         totalAmountIncome.notifyListeners();
         incomeList.notifyListeners();
@@ -36,6 +53,7 @@ class Boxes {
         //add Expense List
         expenseList.value.add(element);
         expenseList.notifyListeners();
+
         //add total amount of expense
         totalAmountExpense.value += element.amount;
         totalAmountExpense.notifyListeners();
@@ -44,10 +62,12 @@ class Boxes {
 
     return box;
   }
+//========================================== end getTransaction()==============
 
   //this function return box of category
   static Box<Category> getCategory() => Hive.box<Category>('category');
 }
+//class end!!!
 
 //this method is initilizing database and check adapter is registered or not .
 //opend a box also
@@ -63,8 +83,12 @@ dataBase() async {
   if (!Hive.isAdapterRegistered(CategoryTypeAdapter().typeId)) {
     Hive.registerAdapter(CategoryTypeAdapter());
   }
+  if (!Hive.isAdapterRegistered(PlannerAdapter().typeId)) {
+    Hive.registerAdapter(PlannerAdapter());
+  }
   await Hive.openBox<Transaction>('transaction');
   await Hive.openBox<Category>('category');
+  await Hive.openBox<Planner>('planner');
 }
 
 //================================================== CRUD operation =============================================
@@ -72,6 +96,9 @@ addDataToTransaction(Transaction object) {
   final box = Boxes.getTransaction();
   box.add(object);
   getCategoryWiseData();
+  print('expense list ${expenseList.value.length}');
+
+  plannerFiltr();
 }
 
 addToCategory(Category object) {
@@ -79,6 +106,16 @@ addToCategory(Category object) {
   box.add(object);
 }
 
+//planner===================================== crud ===========================
+Future<Box<Planner>> getPlanner() async {
+  final box = Hive.box<Planner>('planner');
+  return box;
+}
+
+addPlanner(Planner object) async {
+  final box = await getPlanner();
+  box.add(object);
+}
 //default categories
 
 List<Category> defaultCategory = [
@@ -108,6 +145,106 @@ List<Category> defaultCategory = [
       categoryType: CategoryType.expense, categoryName: 'ADD'),
 ];
 
+//========================================= filter category wise =================================
+//it work with getCategorywiseData()
+//if pass categoryname get total amount
+double getCategoryTotal(String categorynAme) {
+  double totalOfCategory = 0;
+  List<Transaction> transaction = Boxes.getTransaction().values.toList();
+
+  var jj = transaction.where((element) {
+    return element.category.categoryName == categorynAme;
+  });
+  jj.every((element) {
+    totalOfCategory += element.amount;
+
+    return true;
+  });
+  return totalOfCategory;
+}
+
+//====================================================================
+//it make two list
+//1.categoryWiseTotalAmount
+//2.categoryExpenseWiseTotalAmount
+ValueNotifier<List<Category>> expenseCategoryList = ValueNotifier([]);
+getCategoryWiseData() {
+  categoryExpenseWiseTotalAmount.value.clear();
+  categoryWiseTotalAmount.value.clear();
+  expenseCategoryList.value.clear();
+  List<Category> category = Boxes.getCategory().values.toList();
+  category.addAll(defaultCategory); //add default category to
+  print(category.length);
+  expenseCategoryList.value = category
+      .where((element) =>
+          element.categoryType == CategoryType.expense &&
+          element.categoryName != 'ADD')
+      .toList();
+
+  List<Transaction> transaction = Boxes.getTransaction().values.toList();
+  // itrate category
+  //pass category name to getcategorytotal(). return total of that category
+  //
+  category.forEach((element) {
+    double total = getCategoryTotal(
+        element.categoryName); // passs category name and return total
+
+//create obj of Categoryawise class and add that object valueNotifier categoryWiseTotalAmount List
+    final val = Categoryawise(category: element, total: total);
+    categoryWiseTotalAmount.value.add(
+        val); //=============================output valueNotifier categoryWiseTotalAmount
+    categoryWiseTotalAmount.notifyListeners();
+    //filter and create LIst Expense
+    if (val.category.categoryType == CategoryType.expense) {
+      categoryExpenseWiseTotalAmount.value.add(
+          val); //===========output valuenoti categoryExpenseWiseTotalAmount
+      categoryExpenseWiseTotalAmount.notifyListeners();
+    }
+  });
+}
+
+//==========================================================================
+//model
+class Categoryawise {
+  final Category category;
+  final double total;
+
+  Categoryawise({required this.category, required this.total});
+}
+//=====================
+
+//function for category
+//category name and under list of transaction
+categoryFilter() async {
+  map.value.clear();
+
+  final box = Hive.box<Transaction>('transaction').values.toList();
+//create map
+//category name and transaction list which under that category
+  for (var categoryname in categoryWiseTotalAmount.value) {
+    map.value[categoryname.category.categoryName] = box
+        .where((element) =>
+            categoryname.category.categoryName == element.category.categoryName)
+        .toList();
+    // for (var element in box) {
+    //   if (box.contains(categoryname.category.categoryName)) {
+    //     cat.add(element);
+    //     print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+    //   } else {
+    //     print(
+    //         "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
+
+    //   }
+    // }
+
+    // map.value[categoryname.category.categoryName] = cat;
+    // print(cat.length);
+    // categorywiseList.value.add(cat);
+    // categorywiseList.notifyListeners();
+  }
+}
+
+//exp
 analysisData(
     {Function(double totalIncome, double totalExpense)? income,
     Function(List<Transaction> transaction)? tra}) {
@@ -162,85 +299,5 @@ analysisData(
     // }));
     // print(total);
     // print(name);
-  }
-}
-
-//========================================= filter category wise =================================
-double getCategoryTotal(String categorynAme) {
-  double totalOfCategory = 0;
-  List<Transaction> transaction = Boxes.getTransaction().values.toList();
-
-  var jj = transaction.where((element) {
-    return element.category.categoryName == categorynAme;
-  });
-  jj.every((element) {
-    totalOfCategory += element.amount;
-
-    return true;
-  });
-  return totalOfCategory;
-}
-
-ValueNotifier<List<Categoryawise>> categoryWiseTotalAmount = ValueNotifier([]);
-ValueNotifier<List<Categoryawise>> categoryExpenseWiseTotalAmount =
-    ValueNotifier([]);
-
-getCategoryWiseData() {
-  categoryExpenseWiseTotalAmount.value.clear();
-  categoryWiseTotalAmount.value.clear();
-  List<Category> category = Boxes.getCategory().values.toList();
-  category.addAll(defaultCategory);
-  List<Transaction> transaction = Boxes.getTransaction().values.toList();
-  category.forEach((element) {
-    double total = getCategoryTotal(element.categoryName);
-    print(total);
-
-    final val = Categoryawise(category: element, total: total);
-    categoryWiseTotalAmount.value.add(val);
-    categoryWiseTotalAmount.notifyListeners();
-    if (val.category.categoryType == CategoryType.expense) {
-      categoryExpenseWiseTotalAmount.value.add(val);
-      categoryExpenseWiseTotalAmount.notifyListeners();
-    }
-  });
-}
-
-class Categoryawise {
-  final Category category;
-  final double total;
-
-  Categoryawise({required this.category, required this.total});
-}
-
-ValueNotifier<List<List<Transaction>>> categorywiseList = ValueNotifier([]);
-ValueNotifier<Map<String, List<Transaction>>> map = ValueNotifier({});
-//function for category
-categoryFilter() async {
-  categorywiseList.value.clear();
-  map.value.clear();
-
-  final box = Hive.box<Transaction>('transaction').values.toList();
-  print(categoryWiseTotalAmount.value.length);
-
-  for (var categoryname in categoryWiseTotalAmount.value) {
-    map.value[categoryname.category.categoryName] = box
-        .where((element) =>
-            categoryname.category.categoryName == element.category.categoryName)
-        .toList();
-    // for (var element in box) {
-    //   if (box.contains(categoryname.category.categoryName)) {
-    //     cat.add(element);
-    //     print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-    //   } else {
-    //     print(
-    //         "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
-
-    //   }
-    // }
-
-    // map.value[categoryname.category.categoryName] = cat;
-    // print(cat.length);
-    // categorywiseList.value.add(cat);
-    // categorywiseList.notifyListeners();
   }
 }

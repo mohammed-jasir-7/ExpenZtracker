@@ -1,3 +1,4 @@
+import 'package:expenztracker/Database/DB%20function/db_function.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_route.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:expenztracker/screens/Onboard/introduction.dart';
@@ -8,6 +9,7 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    getCategoryWiseData();
     navigate(context);
     return Scaffold(
       body: SafeArea(

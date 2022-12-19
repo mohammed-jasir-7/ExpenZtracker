@@ -166,7 +166,7 @@ class TabTwo extends StatelessWidget {
                   ),
                 );
               },
-              separatorBuilder: (context, index) => SizedBox(
+              separatorBuilder: (context, index) => const SizedBox(
                     height: 8,
                   ),
               itemCount: incomeList.value.length),
