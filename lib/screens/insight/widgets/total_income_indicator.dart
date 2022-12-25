@@ -1,9 +1,7 @@
 import 'package:expenztracker/screens/insight/widgets/first_card.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../../../Database/DB function/db_function.dart';
@@ -23,7 +21,7 @@ class _PercentageContainerState extends State<PercentageContainer> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return AnimatedContainer(
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
       width: size.width,
       child: Stack(
         children: [
@@ -33,13 +31,17 @@ class _PercentageContainerState extends State<PercentageContainer> {
               Column(
                 children: [
                   CustomText(
-                      content:
-                          "${(((totalIncomeFilterBased.value / totalIncomeFilterBased.value * 100) - (totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100))).truncate()}%"),
+                      content: totalExpenseFilterBased.value <= 0
+                          ? "0.0"
+                          : totalIncomeFilterBased.value <=
+                                  totalExpenseFilterBased.value
+                              ? "100%"
+                              : "${(totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100).truncate()}%"),
                   CustomText(content: "expense"),
                   Container(
                     width: 10,
                     height: 10,
-                    color: Color.fromARGB(255, 183, 183, 183),
+                    color: const Color.fromARGB(255, 183, 183, 183),
                   ),
                 ],
               ),
@@ -48,7 +50,7 @@ class _PercentageContainerState extends State<PercentageContainer> {
                 builder: (context, value, child) => ValueListenableBuilder(
                   valueListenable: totalIncomeFilterBased,
                   builder: (context, value, child) => CircularPercentIndicator(
-                    backgroundColor: Color.fromARGB(255, 183, 183, 183),
+                    backgroundColor: const Color.fromARGB(255, 183, 183, 183),
                     animation: true,
                     lineWidth: 20,
                     circularStrokeCap: CircularStrokeCap.round,
@@ -58,21 +60,29 @@ class _PercentageContainerState extends State<PercentageContainer> {
                         ? CustomText(content: "Loss")
                         : CustomText(
                             content:
-                                "${((totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100)).truncate()}%"),
+                                "${((totalIncomeFilterBased.value / totalIncomeFilterBased.value * 100) - (totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100)).truncate()}%"),
                     radius: 70,
                     percent: totalIncomeFilterBased.value <=
-                            totalExpenseFilterBased.value
+                                totalExpenseFilterBased.value ||
+                            totalAmountIncome.value == 0
                         ? 0.0
-                        : totalExpenseFilterBased.value /
-                            totalIncomeFilterBased.value,
+                        : (totalIncomeFilterBased.value /
+                                totalIncomeFilterBased.value) -
+                            (totalExpenseFilterBased.value /
+                                    totalIncomeFilterBased.value)
+                                .truncate(),
                   ),
                 ),
               ),
               Column(
                 children: [
                   CustomText(
-                      content:
-                          "${(((totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100))).truncate()}%"),
+                      content: totalIncomeFilterBased.value <= 0
+                          ? "0.0"
+                          : totalIncomeFilterBased.value <=
+                                  totalExpenseFilterBased.value
+                              ? "0.0%"
+                              : "${((totalIncomeFilterBased.value / totalIncomeFilterBased.value * 100) - (totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100).truncate()).truncate()}%"),
                   CustomText(content: "income"),
                   Container(
                     width: 10,
@@ -94,7 +104,7 @@ class _PercentageContainerState extends State<PercentageContainer> {
                   color: Colors.white,
                   duration: const Duration(seconds: 3),
                   child: CustomText(
-                      content: "this graph shows how much income exist"),
+                      content: "This Graph shows how much Income exist"),
                 ),
               ),
               InkWell(

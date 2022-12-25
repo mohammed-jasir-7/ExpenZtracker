@@ -12,18 +12,16 @@ class CategoryListScreen extends StatefulWidget {
 class _CategoryListScreenState extends State<CategoryListScreen> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return ValueListenableBuilder(
       valueListenable: map,
       builder: (context, value, child) => ListView.separated(
           itemBuilder: (context, index) {
-            var b = value.keys.elementAt(index);
-            var gh = map.value.values.elementAt(index);
+            var categoryname = value.keys.elementAt(index);
+            var transactionUnderCategory = map.value.values.elementAt(index);
             double total = 0;
-            gh.forEach((element) {
+            for (var element in transactionUnderCategory) {
               total += element.amount;
-            });
+            }
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: GestureDetector(
@@ -31,44 +29,52 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(9),
-                      color: Color.fromARGB(255, 169, 215, 171)),
+                      color: const Color.fromARGB(255, 222, 247, 210)),
                   child: ExpansionTile(
                       trailing: CustomText(
-                        content: total.toString(),
-                        size: 20,
-                        colour: Colors.red,
+                        content: "\u20b9 $total",
+                        size: 17,
+                        colour: Colors.black87,
                       ),
                       title: CustomText(
-                        content: b,
-                        size: 20,
-                        colour: Colors.red,
+                        content: categoryname,
+                        size: 16,
+                        colour: Colors.black87,
+                        fontname: "Poppins",
                       ),
                       children: [
                         Container(
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(9),
-                              color: Color.fromARGB(255, 232, 243, 232)),
+                              color: const Color.fromARGB(255, 219, 241, 219)),
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: 20),
+                            constraints: const BoxConstraints(minHeight: 20),
                             child: Column(
                               children: [
                                 Column(
                                   children: [
-                                    for (var k in gh)
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          CustomText(
-                                            content:
-                                                '${k.date.day}-${k.date.month}-${k.date.year}',
-                                            align: TextAlign.end,
+                                    for (var k in transactionUnderCategory)
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          color: const Color.fromARGB(
+                                              255, 232, 232, 232),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              CustomText(
+                                                content:
+                                                    '${k.date.day}-${k.date.month}-${k.date.year}',
+                                                align: TextAlign.end,
+                                              ),
+                                              CustomText(
+                                                content: "\u20b9 ${k.amount}",
+                                                align: TextAlign.end,
+                                              ),
+                                            ],
                                           ),
-                                          CustomText(
-                                            content: k.amount.toString(),
-                                            align: TextAlign.end,
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                   ],
                                 ),
@@ -81,7 +87,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
               ),
             );
           },
-          separatorBuilder: (context, index) => SizedBox(
+          separatorBuilder: (context, index) => const SizedBox(
                 height: 20,
               ),
           itemCount: map.value.length),

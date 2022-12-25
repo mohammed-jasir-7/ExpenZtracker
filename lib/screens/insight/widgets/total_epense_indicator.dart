@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../../../custom WIDGETS/custom_text.dart';
@@ -20,7 +19,7 @@ class _PercentageIndicatorTwoState extends State<PercentageIndicatorTwo> {
     Size size = MediaQuery.of(context).size;
 
     return AnimatedContainer(
-      duration: Duration(seconds: 3),
+      duration: const Duration(seconds: 3),
       width: size.width,
       child: Stack(
         children: [
@@ -32,12 +31,15 @@ class _PercentageIndicatorTwoState extends State<PercentageIndicatorTwo> {
                   CustomText(
                       content: totalIncomeFilterBased.value <= 0
                           ? "0.0"
-                          : "${(((totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100))).truncate()}%"),
+                          : totalIncomeFilterBased.value <=
+                                  totalExpenseFilterBased.value
+                              ? "0.0%"
+                              : "${((totalIncomeFilterBased.value / totalIncomeFilterBased.value * 100) - (totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100).truncate()).truncate()}%"),
                   CustomText(content: "income"),
                   Container(
                     width: 10,
                     height: 10,
-                    color: Color.fromARGB(255, 183, 183, 183),
+                    color: const Color.fromARGB(255, 183, 183, 183),
                   ),
                 ],
               ),
@@ -46,25 +48,29 @@ class _PercentageIndicatorTwoState extends State<PercentageIndicatorTwo> {
                 builder: (context, value, child) => ValueListenableBuilder(
                   valueListenable: totalIncomeFilterBased,
                   builder: (context, value, child) => CircularPercentIndicator(
-                    backgroundColor: Color.fromARGB(255, 183, 183, 183),
-                    animation: true,
-                    lineWidth: 20,
-                    circularStrokeCap: CircularStrokeCap.round,
-                    progressColor: Color.fromARGB(255, 177, 12, 0),
-                    center: totalIncomeFilterBased.value <=
-                            totalExpenseFilterBased.value
-                        ? CustomText(content: "Loss")
-                        : CustomText(
-                            content:
-                                "${((totalExpenseFilterBased.value / totalExpenseFilterBased.value * 100) - (totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100)).truncate()}%"),
-                    radius: 70,
-                    percent: totalExpenseFilterBased.value <= 0
-                        ? 0.0
-                        : totalExpenseFilterBased.value /
-                                totalExpenseFilterBased.value -
-                            totalExpenseFilterBased.value /
-                                totalIncomeFilterBased.value,
-                  ),
+                      backgroundColor: const Color.fromARGB(255, 183, 183, 183),
+                      animation: true,
+                      lineWidth: 20,
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: const Color.fromARGB(255, 213, 14, 0),
+                      center: totalIncomeFilterBased.value <=
+                              totalExpenseFilterBased.value
+                          ? CustomText(content: "Loss")
+                          : CustomText(
+                              content: totalExpenseFilterBased.value <= 0
+                                  ? "0.0"
+                                  : totalIncomeFilterBased.value <=
+                                          totalExpenseFilterBased.value
+                                      ? "100%"
+                                      : "${(totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100).truncate()}%"),
+                      radius: 70,
+                      percent: totalExpenseFilterBased.value <= 0
+                          ? 0.0
+                          : totalIncomeFilterBased.value <=
+                                  totalExpenseFilterBased.value
+                              ? 1.0
+                              : (totalExpenseFilterBased.value /
+                                  totalIncomeFilterBased.value)),
                 ),
               ),
               Column(
@@ -72,7 +78,10 @@ class _PercentageIndicatorTwoState extends State<PercentageIndicatorTwo> {
                   CustomText(
                       content: totalExpenseFilterBased.value <= 0
                           ? "0.0"
-                          : "${((totalExpenseFilterBased.value / totalExpenseFilterBased.value * 100) - (totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100)).truncate()}%"),
+                          : totalIncomeFilterBased.value <=
+                                  totalExpenseFilterBased.value
+                              ? "100%"
+                              : "${(totalExpenseFilterBased.value / totalIncomeFilterBased.value * 100).truncate()}%"),
                   CustomText(content: "expense"),
                   Container(
                     width: 10,
@@ -92,9 +101,9 @@ class _PercentageIndicatorTwoState extends State<PercentageIndicatorTwo> {
                 child: AnimatedContainer(
                   curve: Curves.easeInOut,
                   color: Colors.white,
-                  duration: Duration(seconds: 3),
+                  duration: const Duration(seconds: 3),
                   child: CustomText(
-                      content: "this graph shows how much income exist"),
+                      content: "This Graph shows how much Income exist"),
                 ),
               ),
               InkWell(
@@ -115,6 +124,5 @@ class _PercentageIndicatorTwoState extends State<PercentageIndicatorTwo> {
         ],
       ),
     );
-    ;
   }
 }

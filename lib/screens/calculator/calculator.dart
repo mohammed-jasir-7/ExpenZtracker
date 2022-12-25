@@ -6,16 +6,21 @@ import 'package:expenztracker/custom%20WIDGETS/custom_textInput.dart';
 import 'package:expenztracker/screens/calculator/calculator_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 //==================================================== calculator =====================================================
 // screen calculator
 class Calculator extends StatefulWidget {
   const Calculator(
-      {super.key, required this.appTitle, required this.categoryType});
+      {super.key,
+      required this.appTitle,
+      required this.categoryType,
+      this.isvisible = true});
   //variables
   // receive apptitile and categorytype
   final String appTitle;
   final CategoryType categoryType;
+  final bool isvisible;
 
   @override
   State<Calculator> createState() => _CalculatorState();
@@ -47,35 +52,40 @@ class _CalculatorState extends State<Calculator> {
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
                 width: size.width,
-                child: TextButton(
-                    //==================  date button
-                    onPressed: () {
-                      dateShow(context);
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.calendar_month_rounded,
-                          color: Colors.black,
-                        ),
-                        CustomText(
-                          // date show here
-                          content: date == null
-                              ? 'Choose date'
-                              : '${date!.day}'
-                                  "-"
-                                  '${date!.month}'
-                                  "-"
-                                  '${date!.year}',
-                          colour: Colors.black,
-                          weight: FontWeight.w600,
-                        )
-                      ],
-                    )),
+                child: Visibility(
+                  visible: widget.isvisible,
+                  child: TextButton(
+                      //==================  date button
+                      onPressed: () {
+                        dateShow(context);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.calendar_month_rounded,
+                            color: Colors.black,
+                          ),
+                          CustomText(
+                            fontname: "Poppins",
+                            // date show here
+                            content: date == null
+                                ? 'Choose date'
+                                : '${date!.day}'
+                                    "-"
+                                    '${date!.month}'
+                                    "-"
+                                    '${date!.year}',
+                            colour: Colors.black,
+                            weight: FontWeight.w600,
+                          )
+                        ],
+                      )),
+                ),
               ),
             ), //================navigate to calculator ==============
             CalculatorDisplay(
+              isvisible: widget.isvisible,
               date: date ?? DateTime.now(),
               appTitle: widget.appTitle,
               categoryType: widget.categoryType,
@@ -105,13 +115,15 @@ class CalculatorDisplay extends StatefulWidget {
       {super.key,
       required this.appTitle,
       required this.date,
-      required this.categoryType});
+      required this.categoryType,
+      required this.isvisible});
 
   // variables
   //receive from calculator class
   final String appTitle;
   final DateTime date;
   final CategoryType categoryType;
+  final bool isvisible;
 
   @override
   State<CalculatorDisplay> createState() => _CalculatorDisplayState();
@@ -124,6 +136,7 @@ class _CalculatorDisplayState extends State<CalculatorDisplay> {
   String texttoDisply = '';
   String? res;
   String? operation;
+  bool amountValidation = false;
 
   //=================  calculaor function ==============================
 
@@ -174,44 +187,60 @@ class _CalculatorDisplayState extends State<CalculatorDisplay> {
     return Column(
       children: [
         //================================  calculator disply ========================
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Colors.green,
+        Padding(
+          padding: widget.isvisible == false
+              ? const EdgeInsets.only(top: 40, bottom: 60)
+              : EdgeInsets.zero,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.green,
+            ),
+            width: size.width / 1.1,
+            height: 75,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CustomText(
+                  content: texttoDisply,
+                  size: 30,
+                  colour: Colors.white,
+                ),
+                IconButton(
+                    // backspace button
+                    style: const ButtonStyle(),
+                    onPressed: () {
+                      callBack("<");
+                    },
+                    icon: const Icon(
+                      Icons.backspace_rounded,
+                      color: Colors.white,
+                    ))
+              ],
+            ),
           ),
-          width: size.width / 1.1,
-          height: 75,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              CustomText(
-                content: texttoDisply,
-                size: 30,
-                colour: Colors.white,
-              ),
-              IconButton(
-                  // backspace button
-                  style: const ButtonStyle(),
-                  onPressed: () {
-                    callBack("<");
-                  },
-                  icon: const Icon(
-                    Icons.backspace_rounded,
-                    color: Colors.white,
-                  ))
-            ],
+        ),
+        Visibility(
+          visible: amountValidation,
+          child: CustomText(
+            content: "please enter the amount",
+            fontname: "Poppins",
+            colour: Colors.red,
           ),
         ),
         //============================ calculator disply end==================
         //============= note section =======================================
-        SizedBox(
-          width: 300,
-          height: 80,
-          child: CustomTextfiled(
-              controller: note,
-              hint: 'note',
-              icon: Icons.edit,
-              limit: [LengthLimitingTextInputFormatter(50)]),
+        Visibility(
+          visible: widget.isvisible,
+          child: SizedBox(
+            width: 300,
+            height: 80,
+            child: CustomTextfiled(
+                controller: note,
+                hint: 'note',
+                icon: Icons.edit,
+                limit: [LengthLimitingTextInputFormatter(50)]),
+          ),
         ),
         //====================================================================
         //========================== calculator button start here =========================
@@ -310,34 +339,46 @@ class _CalculatorDisplayState extends State<CalculatorDisplay> {
         ),
         //=========================================================================================
         //========================================= chooose category button ===================================
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(50)),
-            width: 330,
-            height: 70,
-            child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0XFF2CCD39), width: 5)),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      CustomPageRoute(
-                          child: CategoryScreen(
-                        //===================          navigate to category selection screeen
-                        amount: double.parse(texttoDisply),
-                        categoryType: widget.categoryType,
-                        date: widget.date,
-                        note: note.text,
-                        appTitle: widget.appTitle.toUpperCase(),
-                      )));
-                },
-                child: CustomText(
-                  content: "Choose Category",
-                  colour: Colors.black,
-                  size: 28,
-                  weight: FontWeight.w600,
-                )),
+        Visibility(
+          visible: widget.isvisible,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Container(
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(50)),
+              width: 330,
+              height: 70,
+              child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      side:
+                          const BorderSide(color: Color(0XFF2CCD39), width: 5)),
+                  onPressed: () {
+                    if (texttoDisply.isEmpty) {
+                      setState(() {
+                        amountValidation = true;
+                      });
+                    } else {
+                      Navigator.push(
+                          context,
+                          CustomPageRoute(
+                              child: CategoryScreen(
+                            //===================          navigate to category selection screeen
+                            amount: double.parse(texttoDisply),
+                            categoryType: widget.categoryType,
+                            date: widget.date,
+                            note: note.text,
+                            appTitle: widget.appTitle.toUpperCase(),
+                          )));
+                    }
+                  },
+                  child: CustomText(
+                    fontname: "Poppins",
+                    content: "Choose Category",
+                    colour: Colors.black,
+                    size: 23,
+                    weight: FontWeight.w600,
+                  )),
+            ),
           ),
         )
       ],

@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.expenztracker">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
    <application
-        android:label="expenztracker"
+        android:label="Expenz"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

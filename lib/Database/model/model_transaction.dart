@@ -51,14 +51,14 @@ class Category extends HiveObject {
   final CategoryType categoryType;
   @HiveField(5)
   final String? imagePath;
+  @HiveField(6)
+  bool isDelete;
 
-  Category(
-    this.icon,
-    this.color, {
-    required this.categoryType,
-    required this.categoryName,
-    this.imagePath,
-  });
+  Category(this.icon, this.color,
+      {required this.categoryType,
+      required this.categoryName,
+      this.imagePath,
+      this.isDelete = false});
 }
 
 //============================================== planner model =============================================================================
@@ -70,6 +70,12 @@ class Planner extends HiveObject {
   final DateTime end;
   @HiveField(3)
   final List<Map<Category, int>> budget;
+  @HiveField(4)
+  final String? plannerName;
 
-  Planner({required this.start, required this.end, required this.budget});
+  Planner(
+      {required this.start,
+      required this.end,
+      required this.budget,
+      this.plannerName});
 }

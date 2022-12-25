@@ -48,10 +48,35 @@ dependencies:
   flutter_toggle_tab: ^1.2.0
   flutter_colorpicker: ^1.0.3
   percent_indicator: ^4.2.2
+  flutter_local_notifications: ^13.0.0
+  rxdart: ^0.27.7
+  flutter_native_timezone: ^2.0.0
+  shared_preferences: ^2.0.15
+  drop_shadow: ^0.0.1+4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+   
+  flutter_launcher_icons: "^0.11.0"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/applogo.png"
+  # min_sdk_android: 21 # android min sdk min:16, default 21
+  # web:
+  #   generate: true
+  #   image_path: "path/to/image.png"
+  #   background_color: "#hexcode"
+  #   theme_color: "#hexcode"
+  # windows:
+  #   generate: true
+  #   image_path: "path/to/image.png"
+  #   icon_size: 48 # min:48, max:256, default: 48
+  # macos:
+  #   generate: true
+  #   image_path: "path/to/image.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -84,6 +109,22 @@ flutter:
      - assets/icons/Transport.png
      - assets/icons/expEatingout.png
      - assets/icons/expHealth.png
+     - assets/icons/expense.png
+     - assets/icons/income.png
+     - assets/icons/savings.png
+     - assets/icons/salary.png
+     - assets/icons/deposit.png
+     - assets/icons/taxi.png
+     - assets/icons/communicaton.png
+     - assets/icons/food.png
+     - assets/icons/loan.png
+     - assets/icons/fashion.png
+     - assets/icons/insurance.png
+     - assets/icons/electricity.png
+     - assets/icons/insights.png
+     - assets/icons/calculator.png
+     - assets/icons/planner.png
+     - assets/icons/about.png
 
   #   - images/a_dot_ham.jpeg
 

@@ -4,6 +4,7 @@ import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:expenztracker/screens/home/home_screen.dart';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -122,9 +123,10 @@ class _LogintextfieldState extends State<Logintextfield> {
                     ),
                     onPressed: () {
                       if (_formkey.currentState!.validate()) {
+                        login(_controller.text);
                         Navigator.pushAndRemoveUntil(
                             context,
-                            CustomPageRoute(child: HomeScreen()),
+                            CustomPageRoute(child: const HomeScreen()),
                             (route) => false);
                       }
                     },
@@ -145,5 +147,10 @@ class _LogintextfieldState extends State<Logintextfield> {
     } else {
       return null;
     }
+  }
+
+  login(String name) async {
+    final sharedPreference = await SharedPreferences.getInstance();
+    await sharedPreference.setString("userName", name);
   }
 }

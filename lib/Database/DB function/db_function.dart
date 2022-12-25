@@ -1,8 +1,10 @@
 import 'package:expenztracker/Database/model/model_transaction.dart';
+import 'package:expenztracker/notification/notification_api.dart';
 import 'package:expenztracker/screens/planner/planner_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //============================list of all income & expense ===============================================
 //add data when call getatransaction()
@@ -67,12 +69,20 @@ class Boxes {
   //this function return box of category
   static Box<Category> getCategory() => Hive.box<Category>('category');
 }
+
 //class end!!!
+String? username;
+sharedprefnameset() async {
+  await Future.delayed(const Duration(seconds: 4));
+  final pref = await SharedPreferences.getInstance();
+  username = pref.getString("userName");
+}
 
 //this method is initilizing database and check adapter is registered or not .
 //opend a box also
 //this function call whre database need
 dataBase() async {
+  await sharedprefnameset();
   await Hive.initFlutter();
   if (!Hive.isAdapterRegistered(TransactionAdapter().typeId)) {
     Hive.registerAdapter(TransactionAdapter());
@@ -89,14 +99,21 @@ dataBase() async {
   await Hive.openBox<Transaction>('transaction');
   await Hive.openBox<Category>('category');
   await Hive.openBox<Planner>('planner');
+  await NotificationApi.init(initSheduled: true);
+  listenNotification();
+  NotificationApi.showNotifiicationDaily(
+      title: "Expenz Tracker",
+      date: DateTime.now(),
+      body: "Hello $username , have you updated today's transactions?");
 }
+
+void listenNotification() => NotificationApi.onNotification;
 
 //================================================== CRUD operation =============================================
 addDataToTransaction(Transaction object) {
   final box = Boxes.getTransaction();
   box.add(object);
   getCategoryWiseData();
-  print('expense list ${expenseList.value.length}');
 
   plannerFiltr();
 }
@@ -104,28 +121,37 @@ addDataToTransaction(Transaction object) {
 addToCategory(Category object) {
   final box = Boxes.getCategory();
   box.add(object);
+  getCategoryWiseData();
 }
 
 //planner===================================== crud ===========================
-Future<Box<Planner>> getPlanner() async {
+Box<Planner> getPlanner() {
   final box = Hive.box<Planner>('planner');
   return box;
 }
 
 addPlanner(Planner object) async {
-  final box = await getPlanner();
+  final box = getPlanner();
+  final k = box.keys;
+  box.delete(k);
   box.add(object);
 }
 //default categories
 
 List<Category> defaultCategory = [
   Category(Icons.abc.codePoint, const Color.fromARGB(255, 6, 210, 19).value,
-      categoryType: CategoryType.income, categoryName: 'Salary'),
+      categoryType: CategoryType.income,
+      categoryName: 'Salary',
+      imagePath: "assets/icons/salary.png"),
   Category(Icons.abc.codePoint, Colors.blue.value,
-      categoryType: CategoryType.income, categoryName: 'Deposit'),
+      categoryType: CategoryType.income,
+      categoryName: 'Deposit',
+      imagePath: "assets/icons/deposit.png"),
   Category(Icons.abc.codePoint, const Color.fromARGB(252, 4, 218, 237).value,
-      categoryType: CategoryType.income, categoryName: 'Savings'),
-  Category(Icons.add.codePoint, const Color.fromARGB(252, 4, 218, 237).value,
+      categoryType: CategoryType.income,
+      categoryName: 'Savings',
+      imagePath: "assets/icons/savings.png"),
+  Category(Icons.add.codePoint, const Color.fromARGB(251, 0, 172, 95).value,
       categoryType: CategoryType.income, categoryName: 'ADD'),
 
   // default expense category==========================================================================================
@@ -133,15 +159,43 @@ List<Category> defaultCategory = [
       categoryType: CategoryType.expense,
       categoryName: 'Transport',
       imagePath: "assets/icons/Transport.png"),
-  Category(Icons.add.codePoint, Color(0XFFB40097).value,
+  Category(Icons.add.codePoint, const Color(0XFFB40097).value,
       categoryType: CategoryType.expense,
       categoryName: 'Eating Out',
       imagePath: "assets/icons/expEatingout.png"),
-  Category(Icons.add.codePoint, Color(0XFFFFE600).value,
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 192, 202, 0).value,
       categoryType: CategoryType.expense,
       categoryName: 'Health',
       imagePath: "assets/icons/expHealth.png"),
-  Category(Icons.add.codePoint, Color.fromARGB(251, 30, 115, 190).value,
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 0, 98, 202).value,
+      categoryType: CategoryType.expense,
+      categoryName: 'Recharge',
+      imagePath: "assets/icons/communicaton.png"),
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 0, 202, 175).value,
+      categoryType: CategoryType.expense,
+      categoryName: 'Taxi',
+      imagePath: "assets/icons/taxi.png"),
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 77, 19, 202).value,
+      categoryType: CategoryType.expense,
+      categoryName: 'Food',
+      imagePath: "assets/icons/food.png"),
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 196, 27, 165).value,
+      categoryType: CategoryType.expense,
+      categoryName: 'Electricity',
+      imagePath: 'assets/icons/electricity.png'),
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 196, 27, 112).value,
+      categoryType: CategoryType.expense,
+      categoryName: 'Loan',
+      imagePath: 'assets/icons/loan.png'),
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 155, 73, 18).value,
+      categoryType: CategoryType.expense,
+      categoryName: 'Cloths',
+      imagePath: 'assets/icons/fashion.png'),
+  Category(Icons.add.codePoint, const Color.fromARGB(255, 51, 43, 142).value,
+      categoryType: CategoryType.expense,
+      categoryName: 'Insurance',
+      imagePath: 'assets/icons/insurance.png'),
+  Category(Icons.add.codePoint, const Color.fromARGB(248, 108, 2, 37).value,
       categoryType: CategoryType.expense, categoryName: 'ADD'),
 ];
 

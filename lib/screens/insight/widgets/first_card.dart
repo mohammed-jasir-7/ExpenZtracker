@@ -3,16 +3,15 @@ import 'package:expenztracker/Database/model/model_transaction.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:expenztracker/screens/insight/widgets/total_epense_indicator.dart';
 import 'package:expenztracker/screens/insight/widgets/total_income_indicator.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:intl/intl.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 
 // this variabble for date range
 ValueNotifier<DateTimeRange> dateRangeOfCard = ValueNotifier(DateTimeRange(
-    start: DateTime.now().subtract(Duration(days: 30)), end: DateTime.now()));
+    start: DateTime.now().subtract(const Duration(days: 30)),
+    end: DateTime.now()));
 ValueNotifier<double> totalIncomeFilterBased = ValueNotifier(0);
 ValueNotifier<double> totalExpenseFilterBased = ValueNotifier(0);
 
@@ -31,7 +30,6 @@ class _CardOneState extends State<CardOne> {
 
   @override
   void initState() {
-    // TODO: implement initState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Add Your Code here.
       onchangedd(1);
@@ -138,12 +136,12 @@ class _CardOneState extends State<CardOne> {
             size: 13,
             fontname: "Poppins",
             weight: FontWeight.w500,
-            colour: Color.fromARGB(255, 119, 119, 119),
+            colour: const Color.fromARGB(255, 119, 119, 119),
             align: TextAlign.center,
           ),
 //==============================tile total income =====================================
           InkWell(
-            splashColor: Color.fromARGB(107, 76, 175, 79),
+            splashColor: const Color.fromARGB(107, 76, 175, 79),
             child: ListTile(
               title: CustomText(
                 content: "total income",
@@ -167,7 +165,8 @@ class _CardOneState extends State<CardOne> {
           ),
 //visible when tab listile=====================================================
           Visibility(
-              visible: totalIncomePercentageCard, child: PercentageContainer()),
+              visible: totalIncomePercentageCard,
+              child: const PercentageContainer()),
 //================================ tile total expense =======================================
           InkWell(
             onTap: () {
@@ -175,7 +174,7 @@ class _CardOneState extends State<CardOne> {
                 totalExpensePercentageCard = !totalExpensePercentageCard;
               });
             },
-            splashColor: Color.fromARGB(110, 244, 67, 54),
+            splashColor: const Color.fromARGB(110, 244, 67, 54),
             child: ListTile(
               title: CustomText(
                 content: "total Expense",
@@ -195,7 +194,7 @@ class _CardOneState extends State<CardOne> {
 //visible when tab listile=====================================================
           Visibility(
               visible: totalExpensePercentageCard,
-              child: PercentageIndicatorTwo()),
+              child: const PercentageIndicatorTwo()),
 //===================================== tile end ============================================
         ],
       ),
@@ -272,7 +271,6 @@ class _CardOneState extends State<CardOne> {
           totalExpenseFilterBased.notifyListeners();
         }
       }
-      print(totalIncomeFilterBased.value);
     }
     //===============================================================
     //last 30 days

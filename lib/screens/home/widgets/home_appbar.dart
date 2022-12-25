@@ -10,13 +10,13 @@ import '../../../custom WIDGETS/custom_text.dart';
 
 // ====================================================== app bar ===============================================================
 
+// ignore: must_be_immutable
 class HomeAppBar extends StatelessWidget {
   HomeAppBar({super.key, this.leadingIcon = true});
   bool leadingIcon = true;
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return AppBar(
       centerTitle: true,
       actions: [
@@ -48,9 +48,9 @@ class HomeAppBar extends StatelessWidget {
           ? Builder(
               //drawer icon button
               builder: (context) => IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.sort,
-                      size: size.width * 0.1,
+                      size: 35,
                     ),
                     onPressed: () {
                       return Scaffold.of(context).openDrawer();
@@ -72,14 +72,13 @@ ValueNotifier<List<Transaction>> transaction = ValueNotifier([]);
 //=====================================================search bar ================================================================
 class MysearchDelegate extends SearchDelegate {
   @override
-  // TODO: implement searchFieldStyle
   TextStyle? get searchFieldStyle => const TextStyle(color: Colors.amber);
 
   @override
   List<Widget>? buildActions(BuildContext context) => [
         IconButton(
             onPressed: () {
-              bottomShet(context);
+              bottomShet(context); //filter button
             },
             icon: const Icon(Icons.sort)),
         IconButton(
@@ -105,7 +104,84 @@ class MysearchDelegate extends SearchDelegate {
     //   transaction.value.addAll(get);
     //   transaction.notifyListeners();
     // });
-    return Text("data");
+    return SizedBox(
+      width: double.infinity,
+      child: ValueListenableBuilder(
+        valueListenable: transaction,
+        builder: (context, value, child) {
+          return transaction.value.isNotEmpty
+              ? ListView.separated(
+                  separatorBuilder: (context, index) => const SizedBox(
+                    height: 2,
+                  ),
+                  itemBuilder: (context, index) {
+                    var month =
+                        DateFormat.MMM().format(transaction.value[index].date);
+                    // var year =
+                    //     DateFormat.y().format(transaction.value[index].date);
+                    final amount = TextEditingController();
+                    // final note = TextEditingController();
+                    amount.text = transaction.value[index].amount.toString();
+                    return ListTile(
+                      title: CustomText(
+                        content: transaction.value[index].category.categoryName,
+                        colour: Color(transaction.value[index].category.color),
+                        size: 22,
+                        weight: FontWeight.w600,
+                      ),
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomText(
+                            content:
+                                transaction.value[index].date.day.toString(),
+                            size: 20,
+                            weight: FontWeight.w700,
+                          ),
+                          CustomText(content: month),
+                          CustomText(
+                              content: transaction.value[index].date.year
+                                  .toString()),
+                        ],
+                      ),
+                      trailing: CustomText(
+                        content:
+                            ' +\u20b9 ${transaction.value[index].amount.toString()}',
+                        colour:
+                            transaction.value[index].category.categoryType ==
+                                    CategoryType.expense
+                                ? Colors.red
+                                : Colors.green,
+                        size: 18,
+                        weight: FontWeight.w600,
+                      ),
+                      subtitle: CustomText(
+                        content: transaction.value[index].note,
+                        colour: Colors.grey,
+                      ),
+                    );
+                  },
+                  itemCount: transaction.value.length,
+                )
+              : SizedBox(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CustomText(
+                        content: "No records have been found",
+                        size: 18,
+                        colour: Colors.grey,
+                        fontname: 'Poppins',
+                      ),
+                    ],
+                  ),
+                );
+        },
+      ),
+    );
   }
 
   @override
@@ -121,7 +197,6 @@ class MysearchDelegate extends SearchDelegate {
       // Add Your Code here.
     });
 
-    // TODO: implement buildSuggestions
     return query.isEmpty
         ? SizedBox(
             width: double.infinity,
@@ -143,14 +218,14 @@ class MysearchDelegate extends SearchDelegate {
               ],
             ),
           )
-        : Container(
+        : SizedBox(
             width: double.infinity,
             child: ValueListenableBuilder(
               valueListenable: transaction,
               builder: (context, value, child) {
-                return transaction.value.length != 0
+                return transaction.value.isNotEmpty
                     ? ListView.separated(
-                        separatorBuilder: (context, index) => SizedBox(
+                        separatorBuilder: (context, index) => const SizedBox(
                           height: 2,
                         ),
                         itemBuilder: (context, index) {

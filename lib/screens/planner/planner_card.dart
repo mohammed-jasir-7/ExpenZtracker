@@ -1,15 +1,17 @@
 import 'package:expenztracker/Database/DB%20function/db_function.dart';
 import 'package:expenztracker/Database/model/model_transaction.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 
 import '../../custom WIDGETS/custom_text.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 //planner card==
 ValueNotifier<DateTimeRange> plannerDateRange = ValueNotifier(DateTimeRange(
-    start: DateTime(DateTime.now().year, DateTime.now().month + 1, 1),
-    end: DateTime(DateTime.now().year, DateTime.now().month + 2, 0)));
+    start: DateTime(DateTime.now().year, DateTime.now().month, 1),
+    end: DateTime(DateTime.now().year, DateTime.now().month + 1, 0)));
 
 class PlannerCard extends StatefulWidget {
   const PlannerCard({super.key});
@@ -29,8 +31,6 @@ class _PlannerCardState extends State<PlannerCard> {
       []; //textediting controller used lin list viewbuilder
   @override
   void dispose() {
-    // TODO: implement disp
-
     super.dispose();
   }
 
@@ -38,12 +38,12 @@ class _PlannerCardState extends State<PlannerCard> {
   @override
   Widget build(BuildContext context) {
     var balanceAmount = totalAmountIncome.value - totalAmountExpense.value;
-    _controller.clear();
+
     Size size = MediaQuery.of(context).size;
     return AnimatedContainer(
       width: size.width,
       duration: const Duration(seconds: 3),
-      constraints: BoxConstraints(minHeight: 100),
+      constraints: const BoxConstraints(minHeight: 100),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -70,7 +70,7 @@ class _PlannerCardState extends State<PlannerCard> {
                           DropdownMenuItem(
                             value: 1,
                             child: CustomText(
-                              content: " Next month",
+                              content: " This month",
                               fontname: "Poppins",
                               size: 13,
                               weight: FontWeight.w600,
@@ -87,21 +87,20 @@ class _PlannerCardState extends State<PlannerCard> {
                           //     colour: const Color.fromARGB(221, 51, 51, 51),
                           //   ),
                           // ),
-                          DropdownMenuItem(
-                            value: 2,
-                            child: CustomText(
-                              content: "Custom",
-                              fontname: "Poppins",
-                              size: 13,
-                              weight: FontWeight.w600,
-                              colour: const Color.fromARGB(221, 51, 51, 51),
-                            ),
-                          ),
+                          // DropdownMenuItem(
+                          //   value: 2,
+                          //   child: CustomText(
+                          //     content: "Custom",
+                          //     fontname: "Poppins",
+                          //     size: 13,
+                          //     weight: FontWeight.w600,
+                          //     colour: const Color.fromARGB(221, 51, 51, 51),
+                          //   ),
+                          // ),
                         ],
                         //================== drop down button function ===================================================================
                         onChanged: (value) {
                           onchangedd(value);
-                          print(plannerDateRange.value);
                         },
                       ),
                       //drop down end ==================================================================================
@@ -155,7 +154,7 @@ class _PlannerCardState extends State<PlannerCard> {
 // list view builder
 //planner form ==============================================================
             CustomText(
-              content: 'balance ${balanceAmount}',
+              content: 'balance $balanceAmount',
               colour: Colors.green,
             ),
             Visibility(
@@ -165,53 +164,59 @@ class _PlannerCardState extends State<PlannerCard> {
                 child: Container(
                   color: Colors.green[100],
                   width: size.width / 1.2,
-                  height: 100,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 0),
-                    child: ListView.builder(
-                      //listview builder==
-                      physics: BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: expCategory.length,
-                      itemBuilder: (ctx, index) {
-                        final textcont =
-                            TextEditingController(); //pass texteditiong contriller to a list
-                        _controller.add(textcont);
+                    child: ValueListenableBuilder(
+                      valueListenable: Boxes.getCategory().listenable(),
+                      builder: (context, value, child) => ListView.builder(
+                        // form build here
+                        //listview builder==
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: expenseCategoryList.value.length,
+                        itemBuilder: (ctx, index) {
+                          //pass texteditiong contriller to a list
+                          _controller.add(TextEditingController());
 
-                        return Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.green),
-                              borderRadius: BorderRadius.circular(0)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              //category name
-                              CustomText(
-                                content: expCategory[index].categoryName,
-                                colour: Color(expCategory[index].color),
-                              ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              //textfield =============================================
-                              Container(
-                                  width: 150,
-                                  child: TextField(
-                                    decoration: const InputDecoration(
-                                        prefixIcon: Icon(
-                                          Icons.currency_rupee,
-                                          size: 22,
-                                        ),
-                                        enabledBorder: InputBorder.none,
-                                        focusedBorder: InputBorder.none),
-                                    keyboardType: TextInputType.number,
-                                    controller: textcont,
-                                  ))
-                              //---------------------------------------------------------
-                            ],
-                          ),
-                        );
-                      },
+                          return Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.green),
+                                borderRadius: BorderRadius.circular(0)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                //category name
+                                CustomText(
+                                  content: expenseCategoryList
+                                      .value[index].categoryName,
+                                  colour: Color(
+                                      expenseCategoryList.value[index].color),
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                //textfield =============================================
+                                Container(
+                                    width: 150,
+                                    child: TextField(
+                                      textInputAction: TextInputAction.next,
+                                      decoration: const InputDecoration(
+                                          hintText: "set amount",
+                                          prefixIcon: Icon(
+                                            Icons.currency_rupee,
+                                            size: 22,
+                                          ),
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none),
+                                      keyboardType: TextInputType.number,
+                                      controller: _controller[index],
+                                    ))
+                                //---------------------------------------------------------
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -220,7 +225,14 @@ class _PlannerCardState extends State<PlannerCard> {
             Visibility(
               visible: isVisible,
               child: TextButton(
+
+                  //==================================== function =======================
                   onPressed: () async {
+                    // NotificationApi.showNotifi(
+                    //     date: DateTime.now().add(Duration(seconds: 12)),
+                    //     body: "Your expense crossed limit",
+                    //     title: "warning",
+                    //     playoad: "  ");
                     List<Map<Category, int>> budget = [];
                     Map<Category, int> mapBudget =
                         expenseCategoryList.value.asMap().map(
@@ -245,21 +257,19 @@ class _PlannerCardState extends State<PlannerCard> {
 
                       List<Planner> plannerlist = box.values.toList();
                       for (var element in plannerlist) {
-                        print(monthcheck);
                         if (element.start.year ==
                                 DateTime(
                                         DateTime.now().year,
-                                        DateTime.now().month + 1,
+                                        DateTime.now().month,
                                         DateTime.now().day)
                                     .year &&
                             element.start.month ==
                                 DateTime(
                                         DateTime.now().year,
-                                        DateTime.now().month + 1,
+                                        DateTime.now().month,
                                         DateTime.now().day)
                                     .month) {
                           monthcheck = true;
-                          print("ffffffff");
                         } else {
                           setState(() {
                             monthcheck = false;
@@ -269,14 +279,16 @@ class _PlannerCardState extends State<PlannerCard> {
 
                       if (monthcheck == false) {
                         final obj = Planner(
+                            plannerName: "planner",
                             start: plannerDateRange.value.start,
                             end: plannerDateRange.value.end,
                             budget: budget);
                         addPlanner(obj);
-                        print("dd");
-                        print("hhhh");
                       } else {
-                        print("have plan");
+                        final snakbar = SnackBar(
+                            content:
+                                CustomText(content: "You have already a plan"));
+                        ScaffoldMessenger.of(context).showSnackBar(snakbar);
                       }
                     }
 
@@ -298,20 +310,14 @@ class _PlannerCardState extends State<PlannerCard> {
     //that rebuild texxt (show daterange select wise)
     if (value != null) {
       setState(() {
-        dropdownvalue = value;
+        dropdownvalue = value; //to set cahnde ui
       });
       if (value == 1) {
         setState(() {
           plannerDateRange.value = DateTimeRange(
-              start: DateTime(DateTime.now().year, DateTime.now().month + 1, 1),
-              end: DateTime(DateTime.now().year, DateTime.now().month + 2, 0));
+              start: DateTime(DateTime.now().year, DateTime.now().month, 1),
+              end: DateTime(DateTime.now().year, DateTime.now().month + 1, 0));
 
-          plannerDateRange.notifyListeners();
-        });
-      } else if (value == 2) {
-        setState(() {
-          final date = datefunction();
-          plannerDateRange.value = date;
           plannerDateRange.notifyListeners();
         });
       }

@@ -5,6 +5,8 @@ import 'package:expenztracker/screens/home/widgets/home_piechart.dart';
 import 'package:expenztracker/screens/insight/widgets/first_card.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../Database/model/model_transaction.dart';
 
@@ -18,7 +20,6 @@ class InsightScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
 //=============================  app bar =========================================
       appBar: PreferredSize(
@@ -31,49 +32,43 @@ class InsightScreen extends StatelessWidget {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const CardOne(), // overview
                 const Divider(
                   thickness: 3,
                 ),
-                HomePieChart(), //piechart
+                CustomText(
+                  content: "Total expense",
+                  fontname: "Poppins",
+                  weight: FontWeight.w600,
+                  size: 20,
+                ),
+                HomePieChart(isvisible: false), //piechart
 //buttons
-                Padding(
-                    padding: const EdgeInsets.only(left: 30),
-                    //===== filter buttton ==
-                    child: Row(
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            bottomSheet(context);
-                          },
-                          child: CustomText(content: "Last 30 Days "),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            insightFilter();
-                          },
-                          child: CustomText(content: "Last year"),
-                        ),
-                        TextButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.blue[100]),
-                          ),
-                          onPressed: () {
-                            bottomSheet(context);
-                          },
-                          child: CustomText(content: "Last week"),
-                        ),
-                      ],
-                    )),
+                const Divider(
+                  thickness: 3,
+                ),
+                CustomText(
+                  content: "Last week expense",
+                  fontname: "Poppins",
+                  weight: FontWeight.w600,
+                  size: 16,
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
                 //================================================= line chart =======================================================
                 Padding(
                   padding: const EdgeInsets.only(right: 20),
                   //=======line graph =========
                   child: SizedBox(
-                      width: size.width, height: 300, child: Linechartt()),
+                      width: 300,
+                      height: 300,
+                      child: ValueListenableBuilder(
+                        valueListenable: Boxes.getTransaction().listenable(),
+                        builder: (context, value, child) => Linechartt(),
+                      )),
                 )
               ],
             ),
@@ -101,7 +96,10 @@ class Linechartt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LineChart(
-      Experiment.getLinechartData()); // this function return Line chart data
+        Experiment.getLinechartData(),
+        swapAnimationDuration: const Duration(seconds: 20),
+        swapAnimationCurve: Curves.bounceInOut,
+      ); // this function return Line chart data
 }
 
 //=====================================================================
@@ -112,40 +110,45 @@ class LineTitles {
       topTitles: AxisTitles(sideTitles: null),
       rightTitles: AxisTitles(sideTitles: null),
       bottomTitles: AxisTitles(
+          axisNameWidget: CustomText(content: "Last week dates"),
           sideTitles: SideTitles(
-        showTitles: true,
-        getTitlesWidget: (value, meta) {
-          print("jasssssssssssss");
+            reservedSize: 30,
+            showTitles: true,
+            getTitlesWidget: (value, meta) {
+              switch (value.toInt()) {
+                case 1:
+                  final DateTime date =
+                      DateTime.now().subtract(const Duration(days: 6));
 
-          switch (value.toInt()) {
-            case 1:
-              return Text("jan");
-            case 2:
-              return Text("feb");
-            case 3:
-              return Text("mar");
-            case 4:
-              return Text("Apr");
-            case 5:
-              return Text("may");
-            case 6:
-              return Text("Jun");
-            case 7:
-              return Text("Jul");
-            case 8:
-              return Text("aug");
-            case 9:
-              return Text("sep");
-            case 10:
-              return Text("oct");
-            case 11:
-              return Text("nov");
-            case 10:
-              return Text("dec");
-          }
-          return Text("");
-        },
-      )));
+                  return Text(date.day.toString());
+                case 2:
+                  final DateTime date =
+                      DateTime.now().subtract(const Duration(days: 5));
+                  return Text(date.day.toString());
+                case 3:
+                  final DateTime date =
+                      DateTime.now().subtract(const Duration(days: 4));
+                  return Text(date.day.toString());
+                case 4:
+                  final DateTime date =
+                      DateTime.now().subtract(const Duration(days: 3));
+                  return Text(date.day.toString());
+                case 5:
+                  final DateTime date =
+                      DateTime.now().subtract(const Duration(days: 2));
+                  return Text(date.day.toString());
+                case 6:
+                  final DateTime date =
+                      DateTime.now().subtract(const Duration(days: 1));
+                  return Text(date.day.toString());
+                case 7:
+                  final DateTime date =
+                      DateTime.now().subtract(const Duration(days: 0));
+                  return Text(date.day.toString());
+              }
+              return const Text("");
+            },
+          )));
 }
 //==============================================================================================================
 
@@ -160,9 +163,9 @@ class Experiment {
         backgroundColor: const Color.fromARGB(255, 230, 230, 230),
         titlesData: LineTitles.getTitleData(),
         minX: 1,
-        maxX: 12,
+        maxX: 7,
         minY: 0,
-        maxY: totalAmountExpense.value,
+        maxY: (getLeftsideTitle() + getLeftsideTitle() / 2),
         gridData: FlGridData(
           show: true,
           getDrawingHorizontalLine: (value) =>
@@ -173,15 +176,25 @@ class Experiment {
         borderData: FlBorderData(show: true),
         lineBarsData: [
           LineChartBarData(
+            curveSmoothness: 0.5,
+            preventCurveOverShooting: true,
             barWidth: 3,
             isCurved: true,
             dotData: FlDotData(),
             belowBarData: BarAreaData(
-                show: true, color: Color.fromARGB(129, 244, 67, 54)),
+                show: true, color: const Color.fromARGB(129, 244, 67, 54)),
             spots: gg,
           )
         ]);
   }
+}
+
+double getLeftsideTitle() {
+  double max = gg.first.y;
+  for (var element in gg) {
+    if (element.y > max) max = element.y;
+  }
+  return max;
 }
 
 // Map<String, double> monthly = {
@@ -210,40 +223,66 @@ insightFilter() async {
     5: 0,
     6: 0,
     7: 0,
-    8: 0,
-    9: 0,
-    10: 0,
-    11: 0,
-    12: 0
   };
 
   for (var element in value) {
-    if (daterange.value != null) {}
+    // if (daterange.value != null) {}
     if (element.categoryType == CategoryType.expense) {
-      print(monthly.entries);
-      switch (element.date.month) {
-        case 1:
-          print(element.amount);
-          monthly.update(1, (value) => value + element.amount);
-          print(monthly.entries);
-          break;
+      // if(element.date.isAfter(DateTime.now().subtract(Duration(days: 7)))&&element.date.isBefore(DateTime.now()))
 
-        case 2:
-          monthly.update(2, (value) => value + element.amount);
-          break;
-        case 3:
-          monthly.update(3, (value) => value + element.amount);
-          break;
-        case 4:
-          monthly.update(4, (value) => value + element.amount);
-          break;
-        case 5:
-          monthly.update(5, (value) => value + element.amount);
-          break;
-        case 6:
-          monthly.update(6, (value) => value + element.amount);
-          break;
+      if (DateFormat("yyyy-MM-dd").format(element.date) ==
+          DateFormat("yyyy-MM-dd")
+              .format(DateTime.now().subtract(const Duration(days: 6)))) {
+        monthly.update(1, (value) => value + element.amount);
+      } else if (DateFormat("yyyy-MM-dd").format(element.date) ==
+          DateFormat("yyyy-MM-dd")
+              .format(DateTime.now().subtract(const Duration(days: 5)))) {
+        monthly.update(2, (value) => value + element.amount);
+      } else if (DateFormat("yyyy-MM-dd").format(element.date) ==
+          DateFormat("yyyy-MM-dd")
+              .format(DateTime.now().subtract(const Duration(days: 4)))) {
+        monthly.update(3, (value) => value + element.amount);
+      } else if (DateFormat("yyyy-MM-dd").format(element.date) ==
+          DateFormat("yyyy-MM-dd")
+              .format(DateTime.now().subtract(const Duration(days: 3)))) {
+        monthly.update(4, (value) => value + element.amount);
+      } else if (DateFormat("yyyy-MM-dd").format(element.date) ==
+          DateFormat("yyyy-MM-dd")
+              .format(DateTime.now().subtract(const Duration(days: 2)))) {
+        monthly.update(5, (value) => value + element.amount);
+      } else if (DateFormat("yyyy-MM-dd").format(element.date) ==
+          DateFormat("yyyy-MM-dd")
+              .format(DateTime.now().subtract(const Duration(days: 1)))) {
+        monthly.update(6, (value) => value + element.amount);
+      } else if (DateFormat("yyyy-MM-dd").format(element.date) ==
+          DateFormat("yyyy-MM-dd")
+              .format(DateTime.now().subtract(const Duration(days: 0)))) {
+        monthly.update(7, (value) => value + element.amount);
       }
+      //month code
+      // switch (element.date) {
+      //   case element.date.day:
+      //     print(element.amount);
+      //     monthly.update(1, (value) => value + element.amount);
+      //     print(monthly.entries);
+      //     break;
+
+      //   case 2:
+      //     monthly.update(2, (value) => value + element.amount);
+      //     break;
+      //   case 3:
+      //     monthly.update(3, (value) => value + element.amount);
+      //     break;
+      //   case 4:
+      //     monthly.update(4, (value) => value + element.amount);
+      //     break;
+      //   case 5:
+      //     monthly.update(5, (value) => value + element.amount);
+      //     break;
+      //   case 6:
+      //     monthly.update(6, (value) => value + element.amount);
+      //     break;
+      // }
     }
     gg = monthly
         .map(

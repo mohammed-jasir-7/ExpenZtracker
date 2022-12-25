@@ -1,4 +1,5 @@
 import 'package:expenztracker/Database/DB%20function/db_function.dart';
+import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 
 import 'package:expenztracker/screens/home/widgets/home_categories_content.dart';
 
@@ -17,13 +18,33 @@ class _HomeCategoryItemsState extends State<HomeCategoryItems> {
     Size size = MediaQuery.of(context).size;
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: SizedBox(
         width: size.width,
-        height: 80,
+        height: 150,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: CustomText(
+                    content: "Category",
+                    fontname: "Poppins",
+                    size: 15,
+                    colour: const Color.fromARGB(255, 63, 63, 63),
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.info,
+                      color: Color.fromARGB(244, 93, 93, 93),
+                    ))
+              ],
+            ),
             Expanded(
               child: ValueListenableBuilder(
                 valueListenable: totalAmountExpense,
@@ -64,7 +85,10 @@ class _HomeCategoryItemsState extends State<HomeCategoryItems> {
                   },
                 ),
               ),
-            )
+            ),
+            const Divider(
+              thickness: 1,
+            ),
           ],
         ),
       ),

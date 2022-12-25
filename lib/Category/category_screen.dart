@@ -41,7 +41,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         .where((element) => element.categoryType == widget.categoryType)
         .cast<Category>()
         .toList();
-    print(category[1].imagePath);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -66,6 +66,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     8.0), // ====== default category ============================
                 child: CustomText(
                   content: "Default Categories",
+                  fontname: "Poppins",
                   size: 20,
                 ),
               ),
@@ -91,14 +92,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
 ////3.color
                     //4.callback
 
-                    return CategoryButton(
-                      imagePath: category[index2].imagePath,
-                      category: category[index2],
-                      icon: category[index2].icon,
-                      color: category[index2].color,
-                      //function receive category model from category button
-                      onclickk: onClickk,
-                      itemName: category[index2].categoryName,
+                    return GestureDetector(
+                      onDoubleTap: () {},
+                      child: CategoryButton(
+                        categoryType: widget.categoryType,
+                        imagePath: category[index2].imagePath,
+                        category: category[index2],
+                        icon: category[index2].icon,
+                        color: category[index2].color,
+                        //function receive category model from category button
+                        onclickk: onClickk,
+                        itemName: category[index2].categoryName,
+                      ),
                     );
                   },
                 ),
@@ -121,32 +126,54 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 builder: (context, box, _) {
                   final customcategory = box.values
                       .where((element) =>
-                          element.categoryType == widget.categoryType)
+                          element.categoryType == widget.categoryType &&
+                          element.isDelete == false)
                       .cast<Category>()
                       .toList();
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              childAspectRatio: 1,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 20),
-                      itemCount: customcategory.length,
-                      itemBuilder: (context, index) {
-                        return CategoryButton(
-                          category: customcategory[index],
-                          icon: customcategory[index].icon,
-                          color: customcategory[index].color,
-                          onclickk: onClickk,
-                          itemName: customcategory[index].categoryName,
-                        );
-                      },
-                    ),
+                    child: customcategory.isNotEmpty
+                        ? GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    childAspectRatio: 1,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 20),
+                            itemCount: customcategory.length,
+                            itemBuilder: (context, index) {
+                              return CategoryButton(
+                                categoryType: widget.categoryType,
+                                category: customcategory[index],
+                                icon: customcategory[index].icon,
+                                color: customcategory[index].color,
+                                onclickk: onClickk,
+                                itemName: customcategory[index].categoryName,
+                                doubleClick: ondoubleclikk,
+                              );
+                            },
+                          )
+                        : SizedBox(
+                            width: double.infinity,
+                            height: 200,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CustomText(
+                                  fontname: "Poppins",
+                                  colour: Colors.grey,
+                                  align: TextAlign.center,
+                                  content:
+                                      "OnTap is category button to add transaction\nDouble Tap is  category button to  delete",
+                                  size: 15,
+                                ),
+                              ],
+                            ),
+                          ),
                   );
                 },
               ),
@@ -157,11 +184,35 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
+  //function to delete category
+  ondoubleclikk(Category category) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: CustomText(content: "Delete"),
+        content: CustomText(content: "Are you sure to delete?"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: CustomText(content: "cancel")),
+          TextButton(
+              onPressed: () {
+                final box = Boxes.getCategory();
+                category.isDelete = true;
+                box.putAt(category.key, category);
+                Navigator.pop(context);
+              },
+              child: CustomText(content: "sure"))
+        ],
+      ),
+    );
+  }
   //  call back function
   //this function called in cattegory bbutton's  onclick
 
   onClickk(Category category) {
-    log(widget.date.toString());
     if (category.categoryName == "ADD") {
       popup(context, widget.categoryType);
     } else {
@@ -175,10 +226,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
         // add your code here.
-        Navigator.pushAndRemoveUntil(
-            context, CustomPageRoute(child: HomeScreen()), (route) => false);
+        Navigator.pushAndRemoveUntil(context,
+            CustomPageRoute(child: const HomeScreen()), (route) => false);
       });
-      print("jasirrrrrr");
     }
   }
 }
@@ -192,13 +242,17 @@ class CategoryButton extends StatelessWidget {
       required this.itemName,
       required this.color,
       required this.icon,
-      required this.category});
+      required this.category,
+      required this.categoryType,
+      this.doubleClick});
   final int color;
   final String itemName;
   final int icon;
   final Function onclickk;
+  final Function? doubleClick;
   final Category category;
   final String? imagePath;
+  final CategoryType categoryType;
 
   @override
   Widget build(BuildContext context) {
@@ -207,6 +261,11 @@ class CategoryButton extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Material(
         child: InkWell(
+          onDoubleTap: () {
+            if (doubleClick != null) {
+              doubleClick!(category);
+            }
+          },
           radius: 50,
           splashColor: Colors.green,
           onTap: () {
@@ -226,14 +285,23 @@ class CategoryButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  child: imagePath == null
-                      ? Icon(
-                          IconData(
-                            icon,
-                          ),
-                          color: Color(4245594959),
-                        )
-                      : Image.asset(imagePath!),
+                  child: imagePath == null //if image null
+                      ? itemName == "ADD"
+                          ? const Icon(Icons.add)
+                          : categoryType == CategoryType.expense
+                              ? Image.asset(
+                                  'assets/icons/expense.png',
+                                  width: 40,
+                                )
+                              : Image.asset(
+                                  'assets/icons/income.png',
+                                  width: 40,
+                                  color: Color.fromARGB(255, 241, 160, 0),
+                                )
+                      : Image.asset(
+                          imagePath!,
+                          color: Color(category.color),
+                        ),
                 ),
                 CustomText(content: itemName)
               ],

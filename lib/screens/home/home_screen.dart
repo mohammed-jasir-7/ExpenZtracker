@@ -22,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   @override
   void initState() {
-    // TODO: implement initState
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       getCategoryWiseData();
       categoryFilter();
@@ -37,11 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(50), //custom app bar here
+          preferredSize: const Size.fromHeight(50), //custom app bar here
           child: HomeAppBar()),
       drawer: Drawer(
-        width: size.width / 4.9,
-        child: DrawerScreen(),
+        backgroundColor: const Color.fromARGB(255, 242, 242, 242),
+        elevation: 0,
+        width: size.width / 2,
+        child: const DrawerScreen(),
       ),
       bottomNavigationBar: BottomNavigationBar(
           //bottom naviagation
@@ -61,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.category), label: 'Cateegories')
           ]),
-      body: list.elementAt(selectedIndex),
+      body: SafeArea(child: list.elementAt(selectedIndex)),
     );
   }
 
@@ -70,7 +71,11 @@ class _HomeScreenState extends State<HomeScreen> {
     SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
-        children: [HomeCategoryItems(), HomePieChart(), TwoButtons()],
+        children: [
+          const HomeCategoryItems(),
+          HomePieChart(),
+          const TwoButtons()
+        ],
       ),
     ),
     const TransactionScreen(),

@@ -68,13 +68,14 @@ class CategoryAdapter extends TypeAdapter<Category> {
       categoryType: fields[4] as CategoryType,
       categoryName: fields[2] as String,
       imagePath: fields[5] as String?,
+      isDelete: fields[6] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Category obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(1)
       ..write(obj.icon)
       ..writeByte(2)
@@ -84,7 +85,9 @@ class CategoryAdapter extends TypeAdapter<Category> {
       ..writeByte(4)
       ..write(obj.categoryType)
       ..writeByte(5)
-      ..write(obj.imagePath);
+      ..write(obj.imagePath)
+      ..writeByte(6)
+      ..write(obj.isDelete);
   }
 
   @override
@@ -114,19 +117,22 @@ class PlannerAdapter extends TypeAdapter<Planner> {
       budget: (fields[3] as List)
           .map((dynamic e) => (e as Map).cast<Category, int>())
           .toList(),
+      plannerName: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Planner obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(1)
       ..write(obj.start)
       ..writeByte(2)
       ..write(obj.end)
       ..writeByte(3)
-      ..write(obj.budget);
+      ..write(obj.budget)
+      ..writeByte(4)
+      ..write(obj.plannerName);
   }
 
   @override

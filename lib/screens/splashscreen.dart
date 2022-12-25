@@ -2,7 +2,9 @@ import 'package:expenztracker/Database/DB%20function/db_function.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_route.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:expenztracker/screens/Onboard/introduction.dart';
+import 'package:expenztracker/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -20,10 +22,13 @@ class SplashScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               AnimatedOpacity(
-                  duration: const Duration(seconds: 2),
+                  duration: const Duration(seconds: 1),
                   opacity: 1.0,
                   curve: Curves.easeInOut,
-                  child: Image.asset('assets/icons/image 1.png')),
+                  child: Image.asset(
+                    'assets/icons/image 1.png',
+                    width: 200,
+                  )),
               Stack(
                 //=============================================================logo section========================================
                 children: [
@@ -86,10 +91,22 @@ class SplashScreen extends StatelessWidget {
   }
 
   Future<void> navigate(BuildContext ctx) async {
-    await Future.delayed(const Duration(seconds: 4));
-    Navigator.pushReplacement(
-      ctx,
-      CustomPageRoute(child: WelcomeScreen()),
-    );
+    await Future.delayed(const Duration(seconds: 2));
+    final pref = await SharedPreferences.getInstance();
+    String? name = pref.getString("userName");
+    if (name != null) {
+      print(name);
+      if (name.isNotEmpty) {
+        Navigator.pushReplacement(
+          ctx,
+          CustomPageRoute(child: const HomeScreen()),
+        );
+      }
+    } else {
+      Navigator.pushReplacement(
+        ctx,
+        CustomPageRoute(child: const WelcomeScreen()),
+      );
+    }
   }
 }

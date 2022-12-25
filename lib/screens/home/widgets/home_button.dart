@@ -1,3 +1,4 @@
+import 'package:drop_shadow/drop_shadow.dart';
 import 'package:expenztracker/Database/DB%20function/db_function.dart';
 import 'package:expenztracker/Database/model/model_transaction.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_route.dart';
@@ -14,7 +15,7 @@ class TwoButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 40, right: 40, top: 30),
+      padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -51,31 +52,46 @@ class _BalanceShowState extends State<BalanceShow> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.green[200],
-        height: 30,
-        width: 150,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            CustomText(content: "Balance"),
-            ValueListenableBuilder(
-              // ====== listen total expense notifier =========
-              valueListenable: totalAmountExpense,
-              builder: (context, value, child) => ValueListenableBuilder(
-                //==========listen total income notifier==============
-                valueListenable: totalAmountIncome,
-                builder: (context, value, child) => CustomText(
-                  content:
-                      "\u20b9${totalAmountIncome.value - totalAmountExpense.value}", //==== operation  (income-expense)
-                  colour: (totalAmountIncome.value -
-                              totalAmountExpense.value) //color chaange depends
-                          .isNegative
-                      ? Colors.red
-                      : Colors.black,
+        decoration: BoxDecoration(
+            color: Colors.green[200], borderRadius: BorderRadius.circular(30)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 50, minHeight: 40),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CustomText(
+                  fontname: "Poppins",
+                  content: "Balance",
+                  size: 16,
                 ),
-              ),
-            )
-          ],
+                const SizedBox(
+                  width: 14,
+                ),
+                ValueListenableBuilder(
+                  // ====== listen total expense notifier =========
+                  valueListenable: totalAmountExpense,
+                  builder: (context, value, child) => ValueListenableBuilder(
+                    //==========listen total income notifier==============
+                    valueListenable: totalAmountIncome,
+                    builder: (context, value, child) => CustomText(
+                      size: 16,
+                      content:
+                          "-\u20b9 ${totalAmountIncome.value - totalAmountExpense.value}", //==== operation  (income-expense)
+                      colour: (totalAmountIncome.value -
+                                  totalAmountExpense
+                                      .value) //color chaange depends
+                              .isNegative
+                          ? Colors.red
+                          : Colors.black,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ));
   }
 }
@@ -98,13 +114,20 @@ class AddButton extends StatelessWidget {
                   appTitle: "new income", categoryType: CategoryType.income),
             ));
       },
-      child: Container(
-        width: 100,
-        height: 100,
-        decoration: BoxDecoration(
-            border: Border.all(color: const Color(0XFF00900E), width: 20),
-            borderRadius: BorderRadius.circular(50)),
-        child: const Icon(Icons.add), //==== botton icon
+      child: DropShadow(
+        borderRadius: 0.5,
+        blurRadius: 2,
+        offset: const Offset(1, 1),
+        spread: 0.4,
+        opacity: 0.6,
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+              border: Border.all(color: const Color(0XFF00900E), width: 20),
+              borderRadius: BorderRadius.circular(50)),
+          child: const Icon(Icons.add), //==== botton icon
+        ),
       ),
     );
   }
@@ -126,13 +149,20 @@ class ExpenseButton extends StatelessWidget {
                   appTitle: "new expense", categoryType: CategoryType.expense),
             ));
       },
-      child: Container(
-        width: 100,
-        height: 100,
-        decoration: BoxDecoration(
-            border: Border.all(color: const Color(0XFFD73E3E), width: 20),
-            borderRadius: BorderRadius.circular(50)),
-        child: const Icon(Icons.remove), //== button icon
+      child: DropShadow(
+        borderRadius: 0.5,
+        blurRadius: 2,
+        offset: const Offset(1, 1),
+        spread: 0.4,
+        opacity: 0.6,
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+              border: Border.all(color: const Color(0XFFD73E3E), width: 20),
+              borderRadius: BorderRadius.circular(50)),
+          child: const Icon(Icons.remove), //== button icon
+        ),
       ),
     );
   }

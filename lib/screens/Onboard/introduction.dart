@@ -44,7 +44,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       onPressed: () {
                         Navigator.pushAndRemoveUntil(
                             context,
-                            CustomPageRoute(child: Login()) //page transition
+                            CustomPageRoute(
+                                child: const Login()) //page transition
                             ,
                             (route) => false);
                       },
@@ -113,7 +114,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             duration: const Duration(microseconds: 400000),
                             color: currentIndex == index
                                 ? Colors.white
-                                : Color.fromARGB(169, 255, 255, 255),
+                                : const Color.fromARGB(169, 255, 255, 255),
                             width: currentIndex == index ? 20 : 10,
                             height: 8,
                           ),
@@ -138,7 +139,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         if (currentIndex == 2) {
                           Navigator.pushAndRemoveUntil(
                               context,
-                              CustomPageRoute(child: Login()) //page transition
+                              CustomPageRoute(
+                                  child: const Login()) //page transition
                               ,
                               (route) => false);
                         }
@@ -151,7 +153,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 : 'Continue',
                         size: 16,
                         weight: FontWeight.w500,
-                        colour: Color(0XFF006B38),
+                        colour: const Color(0XFF006B38),
                       )),
                 ),
               ),
@@ -166,6 +168,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 //it work when click button and navigate to next screeen
   slide() async {
     await _controller.nextPage(
-        duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 }

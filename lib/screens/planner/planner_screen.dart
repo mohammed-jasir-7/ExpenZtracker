@@ -5,13 +5,19 @@ import 'package:expenztracker/screens/home/widgets/home_appbar.dart';
 
 import 'package:expenztracker/screens/planner/planner_card.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-import 'package:hive/hive.dart';
+import '../../notification/notification_api.dart';
 
 //planner screeen
-class PlannerScreen extends StatelessWidget {
+class PlannerScreen extends StatefulWidget {
   const PlannerScreen({super.key});
 
+  @override
+  State<PlannerScreen> createState() => _PlannerScreenState();
+}
+
+class _PlannerScreenState extends State<PlannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,108 +27,155 @@ class PlannerScreen extends StatelessWidget {
           child: HomeAppBar(
             leadingIcon: false,
           )),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            PlannerCard(),
-            Divider(
-              thickness: 2,
-            ),
-            //next section
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    CustomText(content: "This month "),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            CustomText(content: "Categorry"),
-                            CustomText(content: "Limit"),
-                            CustomText(content: "Balance"),
-                            CustomText(content: "Daily Avg")
-                          ]),
-                    ),
-                    Column(
-                      children: [
-                        ValueListenableBuilder(
-                          valueListenable: expenseList,
-                          builder: (context, value, child) => FutureBuilder(
-                            future: plannerFiltr(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                if (snapshot.data != null) {
-                                  final list =
-                                      snapshot.data as List<Map<Category, int>>;
-                                  final List<Category> keyOfMap =
-                                      list[0].keys.toList();
-                                  final List<int> mapValues =
-                                      list[0].values.toList();
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const PlannerCard(), // card to select plan
 
-                                  return Container(
-                                    height: 200,
-                                    child: Column(
-                                      children: [
-                                        Expanded(
-                                          child: ListView.separated(
-                                              shrinkWrap: true,
-                                              itemBuilder: (context, index) {
-                                                return Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    CustomText(
-                                                        content: keyOfMap[index]
-                                                            .categoryName),
-                                                    CustomText(
-                                                        content:
-                                                            mapValues[index]
-                                                                .toString()),
-                                                    CustomText(
-                                                        content: (mapValues[
-                                                                    index] -
-                                                                datewiseplanner
-                                                                    .value[
-                                                                        index]
-                                                                    .total)
-                                                            .toString()),
-                                                    CustomText(
-                                                        content:
-                                                            (mapValues[index] /
-                                                                    30)
-                                                                .round()
-                                                                .toString())
-                                                  ],
-                                                );
-                                              },
-                                              separatorBuilder:
-                                                  (context, index) => Divider(),
-                                              itemCount: keyOfMap.length),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  return Text("data");
-                                }
-                              } else {
-                                return Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                            },
+              const Divider(
+                thickness: 2,
+              ),
+              //next section
+              Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            children: [
+                              CustomText(content: "This month "),
+                            ],
                           ),
-                        ),
-                      ],
-                    )
-                  ],
-                ))
-          ],
+                          IconButton(
+                              onPressed: () {
+                                final hh = getPlanner();
+                                final keyPlanner = hh.keys;
+                                hh.delete(keyPlanner.first);
+                              },
+                              icon: const Icon(Icons.delete))
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              CustomText(content: "Categorry"),
+                              CustomText(content: "Limit"),
+                              CustomText(content: "Balance"),
+                              CustomText(content: "Daily Avg")
+                            ]),
+                      ),
+                      Column(
+                        children: [
+                          ValueListenableBuilder(
+                            valueListenable: getPlanner().listenable(),
+                            builder: (context, value, child) =>
+                                ValueListenableBuilder(
+                              valueListenable: expenseList,
+                              builder: (context, value, child) => FutureBuilder(
+                                future: plannerFiltr(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    if (snapshot.data != null) {
+                                      final list = snapshot.data
+                                          as List<Map<Category, int>>;
+                                      final List<Category> keyOfMap =
+                                          list[0].keys.toList();
+                                      final List<int> mapValues =
+                                          list[0].values.toList();
+
+                                      return SizedBox(
+                                        height: 200,
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: ListView.separated(
+                                                  shrinkWrap: true,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        CustomText(
+                                                          content:
+                                                              keyOfMap[index]
+                                                                  .categoryName,
+                                                          colour: Color(
+                                                              keyOfMap[index]
+                                                                  .color),
+                                                        ),
+                                                        CustomText(
+                                                            content: mapValues[
+                                                                    index]
+                                                                .toString()),
+                                                        CustomText(
+                                                            content: datewiseplanner
+                                                                    .value
+                                                                    .isEmpty
+                                                                ? "--"
+                                                                : datewiseplanner
+                                                                            .value[
+                                                                                index]
+                                                                            .total ==
+                                                                        0
+                                                                    ? "--"
+                                                                    : (mapValues[index] -
+                                                                            datewiseplanner.value[index].total)
+                                                                        .toString()),
+                                                        CustomText(
+                                                            content: datewiseplanner
+                                                                    .value
+                                                                    .isEmpty
+                                                                ? "--"
+                                                                : datewiseplanner
+                                                                            .value[
+                                                                                index]
+                                                                            .total ==
+                                                                        0
+                                                                    ? "--"
+                                                                    : ((mapValues[index] -
+                                                                                datewiseplanner.value[index].total) /
+                                                                            30)
+                                                                        .truncate()
+                                                                        .toString())
+                                                      ],
+                                                    );
+                                                  },
+                                                  separatorBuilder:
+                                                      (context, index) =>
+                                                          const Divider(),
+                                                  itemCount: keyOfMap.length),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return const Text("data");
+                                    }
+                                  } else {
+                                    return Center(
+                                      child:
+                                          CustomText(content: "No data found"),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ))
+            ],
+          ),
         ),
       ),
     );
@@ -130,9 +183,10 @@ class PlannerScreen extends StatelessWidget {
 }
 
 Future<List<Map<Category, int>>?> plannerFiltr() async {
+  datewiseplanner.value.clear();
   //get pplanner box here
   //convert to list
-  final box = await getPlanner();
+  final box = getPlanner();
   List<Planner> plannerList = box.values.toList();
   //itrate
 
@@ -140,11 +194,11 @@ Future<List<Map<Category, int>>?> plannerFiltr() async {
     //check plans. start date andd curent date
     //if its true itrate list of map in element
     if (element.start.month ==
-            DateTime(DateTime.now().year, DateTime.now().month + 1, 1)
+            DateTime(DateTime.now().year, DateTime.now().month, 1)
                 .month && //chech date and year same as now
 
         element.start.year ==
-            DateTime(DateTime.now().year, DateTime.now().month + 1, 1).year) {
+            DateTime(DateTime.now().year, DateTime.now().month + 1, 0).year) {
       for (var category in element.budget) {
         //map itrate and pass category to filterDateWiseExp()
         //that function check some condition after add Values to Valuenotifier- datewiseplanner
@@ -152,6 +206,21 @@ Future<List<Map<Category, int>>?> plannerFiltr() async {
           filterDateWiseExp(key);
         });
       }
+      //================== sample ======================
+      for (var cate in element.budget) {
+        final ke = element.budget[0].values.toList();
+        for (int i = 0; i < ke.length; i++) {
+          num amt = ke[i] - datewiseplanner.value[i].total;
+          if (amt <= 0) {
+            NotificationApi.showNotifi(
+                date: DateTime.now().add(const Duration(minutes: 15)),
+                body: "Your expense crossed limit",
+                title: "warning",
+                playoad: " ");
+          }
+        }
+      }
+      //============================================================
       return element
           .budget; //return list of map for future builder if datecondition is true
     } else {
@@ -168,9 +237,9 @@ filterDateWiseExp(Category categoryname) async {
   double amount = 0;
   for (var element in expenseList.value) {
     if (element.date.isAfter(
-            plannerDateRange.value.start.subtract(Duration(days: 1))) &&
-        element.date
-            .isBefore(plannerDateRange.value.end.add(Duration(days: 1)))) {
+            plannerDateRange.value.start.subtract(const Duration(days: 1))) &&
+        element.date.isBefore(
+            plannerDateRange.value.end.add(const Duration(days: 1)))) {
       if (element.category.categoryName == categoryname.categoryName) {
         amount += element.amount;
       }
