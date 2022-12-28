@@ -16,7 +16,7 @@ List<Onboard> contents = [
       image: 'assets/images/pageTwo.png',
       title: 'Control your spend and\n start saving ',
       content:
-          'ExpenZ tracker helps you control youar\n spaending,track your expenses, and ultimately\nsave more money'),
+          'ExpenZ tracker helps you control your\n spending, track your expenses, and ultimately\nsave more money'),
   Onboard(
       image: 'assets/images/pageThree.png',
       title: 'Toghether we’ll reach\nyour financial goals',

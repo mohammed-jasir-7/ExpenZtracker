@@ -90,6 +90,7 @@ class SplashScreen extends StatelessWidget {
   }
 
   Future<void> navigate(BuildContext ctx) async {
+    //initilization database
     await dataBase();
 
     final pref = await SharedPreferences.getInstance();
