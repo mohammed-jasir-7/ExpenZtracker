@@ -105,6 +105,8 @@ dataBase() async {
       title: "Expenz Tracker",
       date: DateTime.now(),
       body: "Hello $username , have you updated today's transactions?");
+  Boxes.getTransaction();
+  await plannerFiltr();
 }
 
 void listenNotification() => NotificationApi.onNotification;
@@ -155,7 +157,7 @@ List<Category> defaultCategory = [
       categoryType: CategoryType.income, categoryName: 'ADD'),
 
   // default expense category==========================================================================================
-  Category(Icons.add.codePoint, const Color(0XFFEE3300).value,
+  Category(Icons.add.codePoint, Color.fromARGB(255, 203, 77, 42).value,
       categoryType: CategoryType.expense,
       categoryName: 'Transport',
       imagePath: "assets/icons/Transport.png"),
@@ -329,8 +331,6 @@ analysisData(
   income!(incomeValue, expenseValue); //call back
 
   for (int i = 0; i < expenseTransaction.length; i++) {
-    double total = 0;
-    String name = '';
     // for (int j = i; j < expenseTransaction.length; j++) {
     //   if (expenseTransaction[i].category.categoryName ==
     //       expenseTransaction[j].category.categoryName) {

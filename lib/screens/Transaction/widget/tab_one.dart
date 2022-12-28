@@ -161,7 +161,9 @@ class _TabOneState extends State<TabOne> {
                                     transaction[index].note = note.text;
 
                                     transaction[index].save();
+                                    getCategoryWiseData();
                                     categoryFilter();
+                                    insightFilter();
                                   },
                                   child: CustomText(
                                     content: "Edit",

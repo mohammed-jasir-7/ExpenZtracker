@@ -26,10 +26,10 @@ class _HomeCategoryItemsState extends State<HomeCategoryItems> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 15),
+                  padding: const EdgeInsets.only(left: 10, top: 5),
                   child: CustomText(
                     content: "Category",
                     fontname: "Poppins",
@@ -37,12 +37,6 @@ class _HomeCategoryItemsState extends State<HomeCategoryItems> {
                     colour: const Color.fromARGB(255, 63, 63, 63),
                   ),
                 ),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.info,
-                      color: Color.fromARGB(244, 93, 93, 93),
-                    ))
               ],
             ),
             Expanded(

@@ -9,6 +9,7 @@ import '../../../Database/DB function/db_function.dart';
 import '../../../Database/model/model_transaction.dart';
 import '../../../custom WIDGETS/custom_text.dart';
 import '../../../custom WIDGETS/custom_textInput.dart';
+import '../../insight/insight_screen.dart';
 
 class TabThree extends StatefulWidget {
   const TabThree({super.key});
@@ -51,6 +52,7 @@ class _TabThreeState extends State<TabThree> {
                               expenseList.value[index].delete();
                               getCategoryWiseData();
                               categoryFilter();
+                              insightFilter();
                             },
                             icon: const Icon(Icons.delete))
                       ]),
@@ -161,6 +163,9 @@ class _TabThreeState extends State<TabThree> {
                                     expenseList.value[index].note = note.text;
                                     expenseList.value[index].save();
                                     expenseList.notifyListeners();
+                                    getCategoryWiseData();
+                                    categoryFilter();
+                                    insightFilter();
                                   },
                                   child: CustomText(
                                     content: "Edit",

@@ -91,12 +91,12 @@ class SplashScreen extends StatelessWidget {
   }
 
   Future<void> navigate(BuildContext ctx) async {
-    await Future.delayed(const Duration(seconds: 2));
     final pref = await SharedPreferences.getInstance();
     String? name = pref.getString("userName");
     if (name != null) {
       print(name);
       if (name.isNotEmpty) {
+        await dataBase();
         Navigator.pushReplacement(
           ctx,
           CustomPageRoute(child: const HomeScreen()),

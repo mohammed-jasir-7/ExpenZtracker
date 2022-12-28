@@ -59,7 +59,7 @@ class NotificationApi {
     required DateTime date,
   }) async {
     return _notification.zonedSchedule(id, title, body,
-        _schedule(const Time(8, 30)), await notificationDetails(),
+        _schedule(const Time(8, 1, 01)), await notificationDetails(),
         payload: playoad,
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:

@@ -183,6 +183,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
 }
 
 Future<List<Map<Category, int>>?> plannerFiltr() async {
+  print("notificat");
   datewiseplanner.value.clear();
   //get pplanner box here
   //convert to list
@@ -206,14 +207,16 @@ Future<List<Map<Category, int>>?> plannerFiltr() async {
           filterDateWiseExp(key);
         });
       }
+
       //================== sample ======================
       for (var cate in element.budget) {
         final ke = element.budget[0].values.toList();
         for (int i = 0; i < ke.length; i++) {
           num amt = ke[i] - datewiseplanner.value[i].total;
+          print("here ${datewiseplanner.value[i].total}");
           if (amt <= 0) {
             NotificationApi.showNotifi(
-                date: DateTime.now().add(const Duration(minutes: 15)),
+                date: DateTime.now().add(const Duration(minutes: 1)),
                 body: "Your expense crossed limit",
                 title: "warning",
                 playoad: " ");
