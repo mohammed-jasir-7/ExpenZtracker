@@ -107,6 +107,7 @@ dataBase() async {
       body: "Hello $username , have you updated today's transactions?");
   Boxes.getTransaction();
   await plannerFiltr();
+  getCategoryWiseData();
 }
 
 void listenNotification() => NotificationApi.onNotification;
