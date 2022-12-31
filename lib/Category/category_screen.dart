@@ -168,7 +168,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                   colour: Colors.grey,
                                   align: TextAlign.center,
                                   content:
-                                      "OnTap is category button to add transaction\nDouble Tap is  category button to  delete",
+                                      "Tap once on a category to add transaction\nDouble tap on category to delete",
                                   size: 15,
                                 ),
                               ],

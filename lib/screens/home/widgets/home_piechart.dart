@@ -122,35 +122,35 @@ class HomePieChart extends StatelessWidget {
                                     );
                             },
                           ),
-                          ValueListenableBuilder(
-                            valueListenable: totalAmountIncome,
-                            builder: (context, value, child) {
-                              return totalAmountIncome.value <= 0
-                                  ? CustomText(
-                                      content: " ",
-                                      fontname: 'Poppins',
-                                      weight: FontWeight.w600,
-                                    )
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CustomText(content: "+\u20b9"),
-                                        McCountingText(
-                                          begin: 0,
-                                          end: totalAmountIncome.value
-                                              .toDouble(),
-                                          precision: 2,
-                                          style: const TextStyle(
-                                              color: Color(0XFF00900E),
-                                              fontFamily: 'Poppins'),
-                                          duration: Duration(seconds: 1),
-                                          curve: Curves.fastOutSlowIn,
-                                        ),
-                                      ],
-                                    );
-                            },
-                          ),
+                          // ValueListenableBuilder(
+                          //   valueListenable: totalAmountIncome,
+                          //   builder: (context, value, child) {
+                          //     return totalAmountIncome.value <= 0
+                          //         ? CustomText(
+                          //             content: "",
+                          //             fontname: 'Poppins',
+                          //             weight: FontWeight.w600,
+                          //           )
+                          //         : Row(
+                          //             mainAxisAlignment:
+                          //                 MainAxisAlignment.center,
+                          //             children: [
+                          //               CustomText(content: "+\u20b9"),
+                          //               McCountingText(
+                          //                 begin: 0,
+                          //                 end: totalAmountIncome.value
+                          //                     .toDouble(),
+                          //                 precision: 2,
+                          //                 style: const TextStyle(
+                          //                     color: Color(0XFF00900E),
+                          //                     fontFamily: 'Poppins'),
+                          //                 duration: Duration(seconds: 1),
+                          //                 curve: Curves.fastOutSlowIn,
+                          //               ),
+                          //             ],
+                          //           );
+                          //   },
+                          // ),
                         ],
                       ),
                     ),

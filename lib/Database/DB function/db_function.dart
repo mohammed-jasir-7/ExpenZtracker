@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 //============================list of all income & expense ===============================================
 //add data when call getatransaction()
 ValueNotifier<List<Transaction>> incomeList = ValueNotifier([]);
+ValueNotifier<List<Transaction>> allList = ValueNotifier([]);
 ValueNotifier<List<Transaction>> expenseList = ValueNotifier([]);
 //=============================================================================
 //===== value add when call getTransaction()  =================================================================
@@ -35,6 +36,7 @@ class Boxes {
   static Box<Transaction> getTransaction() {
     final box = Hive.box<Transaction>('transaction');
     final listOfTransaction = box.values.toList();
+    allList.value.clear();
     incomeList.value.clear();
     expenseList.value.clear();
     totalAmountIncome.value = 0;
@@ -42,6 +44,8 @@ class Boxes {
     // itrate and divide transaction model into two list
     //and calculate total amount
     for (var element in listOfTransaction) {
+      allList.value.add(element);
+      allList.notifyListeners();
       if (element.categoryType == CategoryType.income) {
         //add values to income List
 

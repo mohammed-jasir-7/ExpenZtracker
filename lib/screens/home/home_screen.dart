@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.currency_exchange), label: 'Transaction'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.category), label: 'Cateegories')
+                icon: Icon(Icons.category), label: 'Categories')
           ]),
       body: SafeArea(child: list.elementAt(selectedIndex)),
     );

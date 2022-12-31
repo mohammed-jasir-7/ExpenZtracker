@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:expenztracker/Database/DB%20function/db_function.dart';
 import 'package:expenztracker/Database/model/model_transaction.dart';
+import 'package:expenztracker/screens/home/widgets/all_list_transaction.dart';
 import 'package:expenztracker/screens/home/widgets/bottomsheet.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -198,26 +199,7 @@ class MysearchDelegate extends SearchDelegate {
     });
 
     return query.isEmpty
-        ? SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.search,
-                  size: 60,
-                  color: Colors.grey,
-                ),
-                CustomText(
-                  content: "search by category or note",
-                  size: 20,
-                  colour: Colors.grey,
-                  fontname: 'Poppins',
-                )
-              ],
-            ),
-          )
+        ? AllListTransaction() // all list first show
         : SizedBox(
             width: double.infinity,
             child: ValueListenableBuilder(

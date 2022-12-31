@@ -6,7 +6,6 @@ import 'package:expenztracker/screens/insight/widgets/first_card.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../Database/model/model_transaction.dart';
 
@@ -62,13 +61,7 @@ class InsightScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 20),
                   //=======line graph =========
-                  child: SizedBox(
-                      width: 300,
-                      height: 300,
-                      child: ValueListenableBuilder(
-                        valueListenable: Boxes.getTransaction().listenable(),
-                        builder: (context, value, child) => Linechartt(),
-                      )),
+                  child: SizedBox(width: 300, height: 300, child: Linechartt()),
                 )
               ],
             ),

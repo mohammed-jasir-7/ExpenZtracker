@@ -96,7 +96,6 @@ class SplashScreen extends StatelessWidget {
     final pref = await SharedPreferences.getInstance();
     String? name = pref.getString("userName");
     if (name != null) {
-      print(name);
       if (name.isNotEmpty) {
         Navigator.pushReplacement(
           ctx,

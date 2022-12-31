@@ -65,7 +65,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              CustomText(content: "Categorry"),
+                              CustomText(content: "Category"),
                               CustomText(content: "Limit"),
                               CustomText(content: "Balance"),
                               CustomText(content: "Daily Avg")
