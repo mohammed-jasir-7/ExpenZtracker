@@ -1,3 +1,4 @@
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/presentation/screens/splash_screen/widgets/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,9 +7,11 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (context) => ,)],
-    child: const MyApp()));
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(
+      create: (context) => TransactionModel(),
+    )
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

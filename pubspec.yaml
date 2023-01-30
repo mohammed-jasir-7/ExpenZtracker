@@ -38,7 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   animated_text_kit: ^4.2.2
   fl_chart: ^0.55.2
-  flutter_scatter: ^0.2.0
+  
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hive_generator: ^2.0.0
@@ -53,6 +53,7 @@ dependencies:
   flutter_native_timezone: ^2.0.0
   shared_preferences: ^2.0.15
   drop_shadow: ^0.0.1+4
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:

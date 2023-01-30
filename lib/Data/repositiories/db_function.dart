@@ -10,7 +10,7 @@ import '../Model/model_transaction.dart';
 
 //============================list of all income & expense ===============================================
 //add data when call getatransaction()
-//ValueNotifier<List<Transaction>> incomeList = ValueNotifier([]);
+ValueNotifier<List<Transaction>> incomeList = ValueNotifier([]);
 ValueNotifier<List<Transaction>> allList = ValueNotifier([]);
 ValueNotifier<List<Transaction>> expenseList = ValueNotifier([]);
 //=============================================================================
