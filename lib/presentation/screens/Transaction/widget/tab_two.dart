@@ -1,3 +1,4 @@
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/presentation/screens/Transaction/widget/tab_one.dart';
 
 import 'package:flutter/material.dart';
@@ -5,39 +6,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
 import '../../../../Data/repositiories/db_function.dart';
 import '../../../../custom WIDGETS/custom_text.dart';
 import '../../../../custom WIDGETS/custom_textInput.dart';
 
-class TabTwo extends StatefulWidget {
+class TabTwo extends StatelessWidget {
   const TabTwo({super.key});
 
   @override
-  State<TabTwo> createState() => _TabTwoState();
-}
-
-class _TabTwoState extends State<TabTwo> {
-  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: incomeList,
-      builder: (context, box, _) {
-        //============================================================ list generated here ========================================
+    //============================================================ list generated here ========================================
+    return Consumer<TransactionModel>(
+      builder: (context, value, child) {
         return Expanded(
           child: ListView.separated(
               physics: const BouncingScrollPhysics(),
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                incomeList.value.sort((a, b) => b.date.compareTo(a.date));
+                value.incomeList.sort((a, b) => b.date.compareTo(a.date));
                 var month =
-                    DateFormat.MMM().format(incomeList.value[index].date);
+                    DateFormat.MMM().format(value.incomeList[index].date);
 
                 final amount = TextEditingController();
                 final note = TextEditingController();
-                amount.text = incomeList.value[index].amount.toString();
-                note.text = incomeList.value[index].note;
+                amount.text = value.incomeList[index].amount.toString();
+                note.text = value.incomeList[index].note;
 
                 return Slidable(
                   //slidable              delete and edit button see when do slide
@@ -49,8 +45,8 @@ class _TabTwoState extends State<TabTwo> {
                         IconButton(
                             //================================= delete button ==================================
                             onPressed: () {
-                              incomeList.value[index].delete();
-                              getCategoryWiseData();
+                              value.incomeList[index].delete();
+                              value.notifyListeners();
                               categoryFilter();
                             },
                             icon: const Icon(Icons.delete))
@@ -63,9 +59,9 @@ class _TabTwoState extends State<TabTwo> {
                         child: ExpansionTile(
                           title: CustomText(
                             content:
-                                incomeList.value[index].category.categoryName,
+                                value.incomeList[index].category.categoryName,
                             colour:
-                                Color(incomeList.value[index].category.color),
+                                Color(value.incomeList[index].category.color),
                             size: 22,
                             weight: FontWeight.w600,
                           ),
@@ -74,21 +70,21 @@ class _TabTwoState extends State<TabTwo> {
                             children: [
                               CustomText(
                                 content:
-                                    incomeList.value[index].date.day.toString(),
+                                    value.incomeList[index].date.day.toString(),
                                 size: 20,
                                 weight: FontWeight.w700,
                               ),
                               CustomText(content: month),
                               CustomText(
-                                  content: incomeList.value[index].date.year
+                                  content: value.incomeList[index].date.year
                                       .toString()),
                             ],
                           ),
                           trailing: CustomText(
                             content:
-                                ' +\u20b9 ${incomeList.value[index].amount.toString()}',
+                                ' +\u20b9 ${value.incomeList[index].amount.toString()}',
                             colour:
-                                incomeList.value[index].category.categoryType ==
+                                value.incomeList[index].category.categoryType ==
                                         CategoryType.expense
                                     ? Colors.red
                                     : Colors.green,
@@ -96,7 +92,7 @@ class _TabTwoState extends State<TabTwo> {
                             weight: FontWeight.w600,
                           ),
                           subtitle: CustomText(
-                            content: incomeList.value[index].note,
+                            content: value.incomeList[index].note,
                             colour: Colors.grey,
                           ),
                           children: [
@@ -114,9 +110,9 @@ class _TabTwoState extends State<TabTwo> {
                                 SizedBox(
                                   width: 250,
                                   child: CustomTextfiled(
-                                    hint: incomeList.value[index].note == ''
+                                    hint: value.incomeList[index].note == ''
                                         ? 'add note'
-                                        : incomeList.value[index].note
+                                        : value.incomeList[index].note
                                             .toString(),
                                     controller: note,
                                     icon: Icons.note_add,
@@ -129,11 +125,9 @@ class _TabTwoState extends State<TabTwo> {
                                           DateTime? date =
                                               await selectdate(context);
                                           if (date != null) {
-                                            setState(() {
-                                              incomeList.value[index].date =
-                                                  date;
-                                              incomeList.value[index].save();
-                                            });
+                                            value.incomeList[index].date = date;
+                                            value.incomeList[index].save();
+                                            value.notifyListeners();
                                           }
                                         },
                                         child: Row(
@@ -142,7 +136,7 @@ class _TabTwoState extends State<TabTwo> {
                                                 Icons.calendar_month_outlined),
                                             CustomText(
                                                 content:
-                                                    "${incomeList.value[index].date.day}-${incomeList.value[index].date.month}-${incomeList.value[index].date.year}")
+                                                    "${value.incomeList[index].date.day}-${value.incomeList[index].date.month}-${value.incomeList[index].date.year}")
                                           ],
                                         ))),
                               ],
@@ -157,11 +151,12 @@ class _TabTwoState extends State<TabTwo> {
                                       backgroundColor: MaterialStatePropertyAll(
                                           Colors.green)),
                                   onPressed: () {
-                                    incomeList.value[index].amount =
+                                    value.incomeList[index].amount =
                                         double.parse(amount.text);
-                                    incomeList.value[index].note = note.text;
-                                    incomeList.value[index].save();
-                                    incomeList.notifyListeners();
+                                    value.incomeList[index].note = note.text;
+                                    value.incomeList[index].save();
+                                    value.notifyListeners();
+                                    //value.incomeList.notifyListeners();
                                     categoryFilter();
                                   },
                                   child: CustomText(
@@ -181,7 +176,7 @@ class _TabTwoState extends State<TabTwo> {
               separatorBuilder: (context, index) => const SizedBox(
                     height: 8,
                   ),
-              itemCount: incomeList.value.length),
+              itemCount: value.incomeList.length),
         );
       },
     );

@@ -1,13 +1,23 @@
 import 'package:expenztracker/Data/Model/model_transaction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Data/repositiories/db_function.dart';
+import '../notification/notification_api.dart';
+import '../presentation/screens/planner/planner_screen.dart';
 
 class TransactionModel extends ChangeNotifier {
   final List<Transaction> allList = [];
-  final List<Transaction> incomeList = [];
+  List<Transaction> incomeList = [];
   final List<Transaction> expenseList = [];
   double totalAmountIncome = 0;
   double totalAmountExpense = 0;
+  set setIncomeList(List<Transaction> newList) {
+    incomeList = newList;
+    notifyListeners();
+  }
 
   Box<Transaction> getTransaction() {
     final box = Hive.box<Transaction>('transaction');
@@ -21,7 +31,7 @@ class TransactionModel extends ChangeNotifier {
     //and calculate total amount
     for (var element in listOfTransaction) {
       allList.add(element);
-      notifyListeners();
+
       if (element.categoryType == CategoryType.income) {
         //add values to income List
 
@@ -29,19 +39,66 @@ class TransactionModel extends ChangeNotifier {
             element); //=================================output to IncomeList
         //add total amount of income to valueNotifier totalAmountIncome=================output
         totalAmountIncome += element.amount;
-        notifyListeners();
-        notifyListeners();
       } else {
         //add Expense List
         expenseList.add(element);
-        notifyListeners();
 
         //add total amount of expense
         totalAmountExpense += element.amount;
-        notifyListeners();
       }
     }
+    notifyListeners();
 
     return box;
+  }
+
+  String? username;
+  sharedprefnameset() async {
+    await Future.delayed(const Duration(seconds: 4));
+    final pref = await SharedPreferences.getInstance();
+    username = pref.getString("userName");
+  }
+
+  //database init
+  dataBase() async {
+    await sharedprefnameset();
+    await Hive.initFlutter();
+    if (!Hive.isAdapterRegistered(TransactionAdapter().typeId)) {
+      Hive.registerAdapter(TransactionAdapter());
+    }
+    if (!Hive.isAdapterRegistered(CategoryAdapter().typeId)) {
+      Hive.registerAdapter(CategoryAdapter());
+    }
+    if (!Hive.isAdapterRegistered(CategoryTypeAdapter().typeId)) {
+      Hive.registerAdapter(CategoryTypeAdapter());
+    }
+    if (!Hive.isAdapterRegistered(PlannerAdapter().typeId)) {
+      Hive.registerAdapter(PlannerAdapter());
+    }
+    await Hive.openBox<Transaction>('transaction');
+    await Hive.openBox<Category>('category');
+    await Hive.openBox<Planner>('planner');
+    await NotificationApi.init(initSheduled: true);
+    listenNotification();
+    NotificationApi.showNotifiicationDaily(
+        title: "Expenz Tracker",
+        date: DateTime.now(),
+        body: "Hello $username , have you updated today's transactions?");
+    getTransaction();
+    await plannerFiltr();
+    getCategoryWiseData();
+  }
+
+// add transaction
+  addDataToTransaction(Transaction object) {
+    final box = Hive.box<Transaction>('transaction');
+
+    box.add(object);
+    getTransaction();
+
+    getCategoryWiseData();
+
+    plannerFiltr();
+    notifyListeners();
   }
 }

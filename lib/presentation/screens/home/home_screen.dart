@@ -1,36 +1,29 @@
+import 'package:expenztracker/business_logic/bottom_navigation_provider.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/drawer.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/home_appbar.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/home_button.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/home_piechart.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/home_selected_item.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../Data/repositiories/db_function.dart';
 import '../Category/category_wise_transaction_list.dart';
 import '../Transaction/transaction_screen.dart';
 import '../insight/insight_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
+
   @override
-  void initState() {
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       getCategoryWiseData();
       categoryFilter();
       insightFilter();
     });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: PreferredSize(
@@ -45,10 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
           //bottom naviagation
           selectedItemColor: Colors.green,
-          onTap: (value) => setState(() {
-                selectedIndex = value;
-              }),
-          currentIndex: selectedIndex,
+          onTap: (value) =>
+              Provider.of<BottomNavigationProvider>(context, listen: false)
+                  .setIndex = value,
+          currentIndex:
+              Provider.of<BottomNavigationProvider>(context).selectedIndex,
           items: const [
             BottomNavigationBarItem(
                 icon: Icon(
@@ -60,7 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.category), label: 'Categories')
           ]),
-      body: SafeArea(child: list.elementAt(selectedIndex)),
+      body: SafeArea(
+          child: Consumer<BottomNavigationProvider>(
+        builder: (context, value, child) => list.elementAt(value.selectedIndex),
+      )),
     );
   }
 

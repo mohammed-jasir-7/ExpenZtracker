@@ -3,42 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
 import '../../../../Data/repositiories/db_function.dart';
+import '../../../../business_logic/transaction_provider.dart';
 import '../../../../custom WIDGETS/custom_text.dart';
 import '../../../../custom WIDGETS/custom_textInput.dart';
 import '../../insight/insight_screen.dart';
 
-class TabOne extends StatefulWidget {
+class TabOne extends StatelessWidget {
   const TabOne({super.key});
 
   @override
-  State<TabOne> createState() => _TabOneState();
-}
-
-class _TabOneState extends State<TabOne> {
-  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Box<Transaction>>(
-      valueListenable: Boxes.getTransaction().listenable(),
-      builder: (context, box, _) {
-        final transaction = box.values.toList().cast<Transaction>();
-        transaction.sort(
-          (a, b) => b.date.compareTo(a.date), // sort date wise
-        );
-        //============================================================ list generated here ========================================
+    return Consumer<TransactionModel>(
+      builder: (context, value, child) {
         return Expanded(
           child: ListView.separated(
               physics: const BouncingScrollPhysics(),
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                var month = DateFormat.MMM().format(transaction[index].date);
+                value.allList.sort((a, b) => b.date.compareTo(a.date));
+                var month = DateFormat.MMM().format(value.allList[index].date);
+
                 final amount = TextEditingController();
                 final note = TextEditingController();
-                amount.text = transaction[index].amount.toString();
-
-                note.text = transaction[index].note;
+                amount.text = value.allList[index].amount.toString();
+                note.text = value.allList[index].note;
 
                 return Slidable(
                   //slidable              delete and edit button see when do slide
@@ -50,10 +42,9 @@ class _TabOneState extends State<TabOne> {
                         IconButton(
                             //================================= delete button ==================================
                             onPressed: () {
-                              transaction[index].delete();
-                              getCategoryWiseData();
+                              value.allList[index].delete();
+                              value.notifyListeners();
                               categoryFilter();
-                              insightFilter();
                             },
                             icon: const Icon(Icons.delete))
                       ]),
@@ -64,8 +55,8 @@ class _TabOneState extends State<TabOne> {
                       child: Card(
                         child: ExpansionTile(
                           title: CustomText(
-                            content: transaction[index].category.categoryName,
-                            colour: Color(transaction[index].category.color),
+                            content: value.allList[index].category.categoryName,
+                            colour: Color(value.allList[index].category.color),
                             size: 22,
                             weight: FontWeight.w600,
                           ),
@@ -73,30 +64,30 @@ class _TabOneState extends State<TabOne> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CustomText(
-                                content: transaction[index].date.day.toString(),
+                                content:
+                                    value.allList[index].date.day.toString(),
                                 size: 20,
                                 weight: FontWeight.w700,
                               ),
                               CustomText(content: month),
                               CustomText(
-                                  content:
-                                      transaction[index].date.year.toString()),
+                                  content: value.allList[index].date.year
+                                      .toString()),
                             ],
                           ),
                           trailing: CustomText(
-                            content: transaction[index].categoryType ==
-                                    CategoryType.income
-                                ? ' +\u20b9 ${transaction[index].amount.toString()}'
-                                : ' -\u20b9 ${transaction[index].amount.toString()}',
-                            colour: transaction[index].category.categoryType ==
-                                    CategoryType.expense
-                                ? Colors.red
-                                : Colors.green,
+                            content:
+                                ' +\u20b9 ${value.allList[index].amount.toString()}',
+                            colour:
+                                value.allList[index].category.categoryType ==
+                                        CategoryType.expense
+                                    ? Colors.red
+                                    : Colors.green,
                             size: 18,
                             weight: FontWeight.w600,
                           ),
                           subtitle: CustomText(
-                            content: transaction[index].note,
+                            content: value.allList[index].note,
                             colour: Colors.grey,
                           ),
                           children: [
@@ -114,9 +105,9 @@ class _TabOneState extends State<TabOne> {
                                 SizedBox(
                                   width: 250,
                                   child: CustomTextfiled(
-                                    hint: transaction[index].note == ''
+                                    hint: value.allList[index].note == ''
                                         ? 'add note'
-                                        : transaction[index].note.toString(),
+                                        : value.allList[index].note.toString(),
                                     controller: note,
                                     icon: Icons.note_add,
                                   ),
@@ -128,10 +119,9 @@ class _TabOneState extends State<TabOne> {
                                           DateTime? date =
                                               await selectdate(context);
                                           if (date != null) {
-                                            setState(() {
-                                              transaction[index].date = date;
-                                              transaction[index].save();
-                                            });
+                                            value.allList[index].date = date;
+                                            value.allList[index].save();
+                                            value.notifyListeners();
                                           }
                                         },
                                         child: Row(
@@ -140,12 +130,11 @@ class _TabOneState extends State<TabOne> {
                                                 Icons.calendar_month_outlined),
                                             CustomText(
                                                 content:
-                                                    '${transaction[index].date.day}-${transaction[index].date.month}-${transaction[index].date.year}')
+                                                    "${value.allList[index].date.day}-${value.allList[index].date.month}-${value.allList[index].date.year}")
                                           ],
                                         ))),
                               ],
                             ),
-                            //edit button================================
                             Container(
                               height: 33,
                               width: 250,
@@ -156,14 +145,13 @@ class _TabOneState extends State<TabOne> {
                                       backgroundColor: MaterialStatePropertyAll(
                                           Colors.green)),
                                   onPressed: () {
-                                    transaction[index].amount =
+                                    value.allList[index].amount =
                                         double.parse(amount.text);
-                                    transaction[index].note = note.text;
-
-                                    transaction[index].save();
-                                    getCategoryWiseData();
+                                    value.allList[index].note = note.text;
+                                    value.allList[index].save();
+                                    value.notifyListeners();
+                                    //value.allList.notifyListeners();
                                     categoryFilter();
-                                    insightFilter();
                                   },
                                   child: CustomText(
                                     content: "Edit",
@@ -182,7 +170,7 @@ class _TabOneState extends State<TabOne> {
               separatorBuilder: (context, index) => const SizedBox(
                     height: 8,
                   ),
-              itemCount: transaction.length),
+              itemCount: value.allList.length),
         );
       },
     );

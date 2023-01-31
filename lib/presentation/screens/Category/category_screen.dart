@@ -1,11 +1,13 @@
 import 'dart:developer';
 
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_route.dart';
 import 'package:expenztracker/presentation/screens/Category/widget/category_add_popup.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
 import '../../../../Data/repositiories/db_function.dart';
@@ -86,7 +88,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       mainAxisSpacing: 20),
                   itemCount: category.length,
                   itemBuilder: (context, index2) {
-                    log(defaultCategory[index2].color.toString());
 //=====================================   category button=========================
 //pass call baack function
 //pass variables
@@ -225,12 +226,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
           category: category,
           note: widget.note ?? '',
           categoryType: widget.categoryType);
-      addDataToTransaction(obj);
+      Provider.of<TransactionModel>(context, listen: false)
+          .addDataToTransaction(obj);
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
         // add your code here.
-        Navigator.pushAndRemoveUntil(context,
-            CustomPageRoute(child: const HomeScreen()), (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context, CustomPageRoute(child: HomeScreen()), (route) => false);
       });
     }
   }

@@ -3,42 +3,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
 import '../../../../Data/repositiories/db_function.dart';
+import '../../../../business_logic/transaction_provider.dart';
 import '../../../../custom WIDGETS/custom_text.dart';
 import '../../../../custom WIDGETS/custom_textInput.dart';
 
-import '../../insight/insight_screen.dart';
 import 'tab_one.dart';
 
-class TabThree extends StatefulWidget {
+class TabThree extends StatelessWidget {
   const TabThree({super.key});
 
   @override
-  State<TabThree> createState() => _TabThreeState();
-}
-
-class _TabThreeState extends State<TabThree> {
-  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: expenseList,
-      builder: (context, box, _) {
-        //============================================================ list generated here ========================================
+    return Consumer<TransactionModel>(
+      builder: (context, value, child) {
+        Provider.of<TransactionModel>(context, listen: true).getTransaction();
+
         return Expanded(
           child: ListView.separated(
               physics: const BouncingScrollPhysics(),
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                expenseList.value.sort((a, b) => b.date.compareTo(a.date));
+                value.incomeList.sort((a, b) => b.date.compareTo(a.date));
                 var month =
-                    DateFormat.MMM().format(expenseList.value[index].date);
+                    DateFormat.MMM().format(value.incomeList[index].date);
 
                 final amount = TextEditingController();
                 final note = TextEditingController();
-                amount.text = expenseList.value[index].amount.toString();
-                note.text = expenseList.value[index].note;
+                amount.text = value.expenseList[index].amount.toString();
+                note.text = value.expenseList[index].note;
 
                 return Slidable(
                   //slidable              delete and edit button see when do slide
@@ -50,10 +46,9 @@ class _TabThreeState extends State<TabThree> {
                         IconButton(
                             //================================= delete button ==================================
                             onPressed: () {
-                              expenseList.value[index].delete();
-                              getCategoryWiseData();
+                              value.expenseList[index].delete();
+                              value.notifyListeners();
                               categoryFilter();
-                              insightFilter();
                             },
                             icon: const Icon(Icons.delete))
                       ]),
@@ -65,9 +60,9 @@ class _TabThreeState extends State<TabThree> {
                         child: ExpansionTile(
                           title: CustomText(
                             content:
-                                expenseList.value[index].category.categoryName,
+                                value.expenseList[index].category.categoryName,
                             colour:
-                                Color(expenseList.value[index].category.color),
+                                Color(value.expenseList[index].category.color),
                             size: 22,
                             weight: FontWeight.w600,
                           ),
@@ -75,22 +70,22 @@ class _TabThreeState extends State<TabThree> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CustomText(
-                                content: expenseList.value[index].date.day
+                                content: value.expenseList[index].date.day
                                     .toString(),
                                 size: 20,
                                 weight: FontWeight.w700,
                               ),
                               CustomText(content: month),
                               CustomText(
-                                  content: expenseList.value[index].date.year
+                                  content: value.expenseList[index].date.year
                                       .toString()),
                             ],
                           ),
                           trailing: CustomText(
                             content:
-                                '-\u20b9 ${expenseList.value[index].amount.toString()}',
-                            colour: expenseList
-                                        .value[index].category.categoryType ==
+                                ' +\u20b9 ${value.expenseList[index].amount.toString()}',
+                            colour: value.expenseList[index].category
+                                        .categoryType ==
                                     CategoryType.expense
                                 ? Colors.red
                                 : Colors.green,
@@ -98,7 +93,7 @@ class _TabThreeState extends State<TabThree> {
                             weight: FontWeight.w600,
                           ),
                           subtitle: CustomText(
-                            content: expenseList.value[index].note,
+                            content: value.expenseList[index].note,
                             colour: Colors.grey,
                           ),
                           children: [
@@ -116,9 +111,9 @@ class _TabThreeState extends State<TabThree> {
                                 SizedBox(
                                   width: 250,
                                   child: CustomTextfiled(
-                                    hint: expenseList.value[index].note == ''
+                                    hint: value.expenseList[index].note == ''
                                         ? 'add note'
-                                        : expenseList.value[index].note
+                                        : value.expenseList[index].note
                                             .toString(),
                                     controller: note,
                                     icon: Icons.note_add,
@@ -131,11 +126,10 @@ class _TabThreeState extends State<TabThree> {
                                           DateTime? date =
                                               await selectdate(context);
                                           if (date != null) {
-                                            setState(() {
-                                              expenseList.value[index].date =
-                                                  date;
-                                              expenseList.value[index].save();
-                                            });
+                                            value.expenseList[index].date =
+                                                date;
+                                            value.expenseList[index].save();
+                                            value.notifyListeners();
                                           }
                                         },
                                         child: Row(
@@ -144,7 +138,7 @@ class _TabThreeState extends State<TabThree> {
                                                 Icons.calendar_month_outlined),
                                             CustomText(
                                                 content:
-                                                    "${expenseList.value[index].date.day}-${expenseList.value[index].date.month}-${expenseList.value[index].date.year}")
+                                                    "${value.expenseList[index].date.day}-${value.expenseList[index].date.month}-${value.expenseList[index].date.year}")
                                           ],
                                         ))),
                               ],
@@ -159,14 +153,13 @@ class _TabThreeState extends State<TabThree> {
                                       backgroundColor: MaterialStatePropertyAll(
                                           Colors.green)),
                                   onPressed: () {
-                                    expenseList.value[index].amount =
+                                    value.expenseList[index].amount =
                                         double.parse(amount.text);
-                                    expenseList.value[index].note = note.text;
-                                    expenseList.value[index].save();
-                                    expenseList.notifyListeners();
-                                    getCategoryWiseData();
+                                    value.expenseList[index].note = note.text;
+                                    value.expenseList[index].save();
+                                    value.notifyListeners();
+                                    //value.expenseList.notifyListeners();
                                     categoryFilter();
-                                    insightFilter();
                                   },
                                   child: CustomText(
                                     content: "Edit",
@@ -185,7 +178,7 @@ class _TabThreeState extends State<TabThree> {
               separatorBuilder: (context, index) => const SizedBox(
                     height: 8,
                   ),
-              itemCount: expenseList.value.length),
+              itemCount: value.expenseList.length),
         );
       },
     );

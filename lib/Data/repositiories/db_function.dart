@@ -39,7 +39,7 @@ class Boxes {
     final box = Hive.box<Transaction>('transaction');
     final listOfTransaction = box.values.toList();
     allList.value.clear();
-    incomeList.value.clear();
+    //incomeList.value.clear();
     expenseList.value.clear();
     totalAmountIncome.value = 0;
     totalAmountExpense.value = 0;
@@ -51,12 +51,12 @@ class Boxes {
       if (element.categoryType == CategoryType.income) {
         //add values to income List
 
-        incomeList.value.add(
-            element); //=================================output to IncomeList
+        // incomeList.value.add(
+        //   element); //=================================output to IncomeList
         //add total amount of income to valueNotifier totalAmountIncome=================output
         totalAmountIncome.value += element.amount;
         totalAmountIncome.notifyListeners();
-        incomeList.notifyListeners();
+        // incomeList.notifyListeners();
       } else {
         //add Expense List
         expenseList.value.add(element);

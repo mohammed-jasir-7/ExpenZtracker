@@ -1,3 +1,4 @@
+import 'package:expenztracker/business_logic/bottom_navigation_provider.dart';
 import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/presentation/screens/splash_screen/widgets/splashscreen.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,8 @@ void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
       create: (context) => TransactionModel(),
-    )
+    ),
+    ChangeNotifierProvider(create: (context) => BottomNavigationProvider())
   ], child: const MyApp()));
 }
 

@@ -1,8 +1,10 @@
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_route.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../Data/repositiories/db_function.dart';
+
 import '../../Onboard/introduction.dart';
 import '../../home/home_screen.dart';
 import 'logo_name.dart';
@@ -48,7 +50,7 @@ class SplashScreen extends StatelessWidget {
 
   Future<void> navigate(BuildContext ctx) async {
     //initilization database
-    await dataBase();
+    await Provider.of<TransactionModel>(ctx).dataBase();
 
     final pref = await SharedPreferences.getInstance();
     String? name = pref.getString("userName");
@@ -56,7 +58,7 @@ class SplashScreen extends StatelessWidget {
       if (name.isNotEmpty) {
         Navigator.pushReplacement(
           ctx,
-          CustomPageRoute(child: const HomeScreen()),
+          CustomPageRoute(child: HomeScreen()),
         );
       }
     } else {

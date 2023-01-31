@@ -5,14 +5,9 @@ import 'package:flutter/material.dart';
 import '../../../../Data/repositiories/db_function.dart';
 import 'home_categories_content.dart';
 
-class HomeCategoryItems extends StatefulWidget {
+class HomeCategoryItems extends StatelessWidget {
   const HomeCategoryItems({super.key});
 
-  @override
-  State<HomeCategoryItems> createState() => _HomeCategoryItemsState();
-}
-
-class _HomeCategoryItemsState extends State<HomeCategoryItems> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

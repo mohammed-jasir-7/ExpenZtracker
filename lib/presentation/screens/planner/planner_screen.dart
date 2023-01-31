@@ -1,8 +1,10 @@
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:expenztracker/presentation/screens/planner/planner_card.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../../../Data/Model/model_transaction.dart';
 import '../../../Data/repositiories/db_function.dart';
@@ -77,8 +79,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                           ValueListenableBuilder(
                             valueListenable: getPlanner().listenable(),
                             builder: (context, value, child) =>
-                                ValueListenableBuilder(
-                              valueListenable: expenseList,
+                                Consumer<TransactionModel>(
                               builder: (context, value, child) => FutureBuilder(
                                 future: plannerFiltr(),
                                 builder: (context, snapshot) {
