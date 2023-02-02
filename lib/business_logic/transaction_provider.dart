@@ -12,6 +12,7 @@ class TransactionModel extends ChangeNotifier {
   final List<Transaction> allList = [];
   List<Transaction> incomeList = [];
   final List<Transaction> expenseList = [];
+  Map<String, List<Transaction>> map = {}; //categoryfilter
   double totalAmountIncome = 0;
   double totalAmountExpense = 0;
   set setIncomeList(List<Transaction> newList) {
@@ -101,4 +102,59 @@ class TransactionModel extends ChangeNotifier {
     plannerFiltr();
     notifyListeners();
   }
+
+  // category filter (category and under transaction)
+  categoryFilter() async {
+    map.clear();
+
+    final box = Hive.box<Transaction>('transaction').values.toList();
+//create map
+//category name and transaction list which under that category
+    for (var categoryname in categoryWiseTotalAmount.value) {
+      map[categoryname.category.categoryName] = box
+          .where((element) =>
+              categoryname.category.categoryName ==
+              element.category.categoryName)
+          .toList();
+    }
+  }
+
+  // search filter  (app baar)
+//   List<Transaction> searchFilter(String query) {
+//   print("hhhS${filterSelectedType.value}");
+//   List<Transaction> transaction = Boxes.getTransaction().values.toList();
+//   List<Transaction> filterd = transaction.where(
+//     (element) {
+//       if (filterSelectedType.value == null && selectedDateRange.value == null) {
+//         return element.category.categoryName
+//                 .toLowerCase()
+//                 .contains(query.toLowerCase()) ||
+//             element.note.toLowerCase().contains(query.toLowerCase());
+//       } else if (filterSelectedType.value != null) {
+//         if (selectedDateRange.value != null) {
+//           if (element.date.isAfter(selectedDateRange.value!.start) &&
+//               element.date.isBefore(selectedDateRange.value!.end) &&
+//               filterSelectedType.value == element.categoryType) {
+//             return element.category.categoryName
+//                     .toLowerCase()
+//                     .contains(query.toLowerCase()) ||
+//                 element.note.toLowerCase().contains(query.toLowerCase());
+//           }
+//         } else {
+//           return element.categoryType == filterSelectedType.value;
+//         }
+//       } else if (element.date.isAfter(selectedDateRange.value!.start) &&
+//           element.date.isBefore(selectedDateRange.value!.end)) {
+//         log("ccccccc");
+//         return element.category.categoryName
+//                 .toLowerCase()
+//                 .contains(query.toLowerCase()) ||
+//             element.note.toLowerCase().contains(query.toLowerCase());
+//       }
+//       return false;
+//     },
+//   ).toList();
+
+//   return filterd;
+// }
 }

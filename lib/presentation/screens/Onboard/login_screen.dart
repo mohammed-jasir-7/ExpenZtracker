@@ -106,7 +106,7 @@ class _LogintextfieldState extends State<Logintextfield> {
                 return null;
               }
             },
-            decoration: const InputDecoration(hintText: "Enter your Name"),
+            decoration: const InputDecoration(hintText: "Enter name"),
           ),
           Padding(
             padding:

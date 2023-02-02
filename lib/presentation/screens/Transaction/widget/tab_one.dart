@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
-import '../../../../Data/repositiories/db_function.dart';
+
 import '../../../../business_logic/transaction_provider.dart';
 import '../../../../custom WIDGETS/custom_text.dart';
 import '../../../../custom WIDGETS/custom_textInput.dart';
-import '../../insight/insight_screen.dart';
 
 class TabOne extends StatelessWidget {
   const TabOne({super.key});
@@ -33,7 +32,7 @@ class TabOne extends StatelessWidget {
                 note.text = value.allList[index].note;
 
                 return Slidable(
-                  //slidable              delete and edit button see when do slide
+                  //slidabledelete and edit button see when do slide
 
                   endActionPane: ActionPane(
                       extentRatio: 0.2,
@@ -44,7 +43,9 @@ class TabOne extends StatelessWidget {
                             onPressed: () {
                               value.allList[index].delete();
                               value.notifyListeners();
-                              categoryFilter();
+                              Provider.of<TransactionModel>(context,
+                                      listen: false)
+                                  .categoryFilter();
                             },
                             icon: const Icon(Icons.delete))
                       ]),
@@ -151,7 +152,9 @@ class TabOne extends StatelessWidget {
                                     value.allList[index].save();
                                     value.notifyListeners();
                                     //value.allList.notifyListeners();
-                                    categoryFilter();
+                                    Provider.of<TransactionModel>(context,
+                                            listen: false)
+                                        .categoryFilter();
                                   },
                                   child: CustomText(
                                     content: "Edit",

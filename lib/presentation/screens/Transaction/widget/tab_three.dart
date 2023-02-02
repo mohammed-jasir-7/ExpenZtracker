@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
-import '../../../../Data/repositiories/db_function.dart';
+
 import '../../../../business_logic/transaction_provider.dart';
 import '../../../../custom WIDGETS/custom_text.dart';
 import '../../../../custom WIDGETS/custom_textInput.dart';
@@ -20,7 +20,7 @@ class TabThree extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<TransactionModel>(
       builder: (context, value, child) {
-        Provider.of<TransactionModel>(context, listen: true).getTransaction();
+        // Provider.of<TransactionModel>(context, listen: true).getTransaction();
 
         return Expanded(
           child: ListView.separated(
@@ -48,7 +48,9 @@ class TabThree extends StatelessWidget {
                             onPressed: () {
                               value.expenseList[index].delete();
                               value.notifyListeners();
-                              categoryFilter();
+                              Provider.of<TransactionModel>(context,
+                                      listen: false)
+                                  .categoryFilter();
                             },
                             icon: const Icon(Icons.delete))
                       ]),
@@ -158,8 +160,9 @@ class TabThree extends StatelessWidget {
                                     value.expenseList[index].note = note.text;
                                     value.expenseList[index].save();
                                     value.notifyListeners();
-                                    //value.expenseList.notifyListeners();
-                                    categoryFilter();
+                                    Provider.of<TransactionModel>(context,
+                                            listen: false)
+                                        .categoryFilter();
                                   },
                                   child: CustomText(
                                     content: "Edit",

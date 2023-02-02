@@ -1,4 +1,5 @@
 import 'package:expenztracker/business_logic/bottom_navigation_provider.dart';
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/drawer.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/home_appbar.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/home_button.dart';
@@ -21,7 +22,7 @@ class HomeScreen extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       getCategoryWiseData();
-      categoryFilter();
+      // Provider.of<TransactionModel>(context).categoryFilter();
       insightFilter();
     });
 

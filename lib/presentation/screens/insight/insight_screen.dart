@@ -146,7 +146,7 @@ class LineTitles {
 }
 //==============================================================================================================
 
-ValueNotifier<List<Transaction>> linchartTransaction = ValueNotifier([]);
+//ValueNotifier<List<Transaction>> linchartTransaction = ValueNotifier([]);
 
 // ======================== return linechart data ============================================
 //

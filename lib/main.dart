@@ -1,4 +1,5 @@
 import 'package:expenztracker/business_logic/bottom_navigation_provider.dart';
+import 'package:expenztracker/business_logic/search_provider.dart';
 import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/presentation/screens/splash_screen/widgets/splashscreen.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,8 @@ void main() async {
     ChangeNotifierProvider(
       create: (context) => TransactionModel(),
     ),
-    ChangeNotifierProvider(create: (context) => BottomNavigationProvider())
+    ChangeNotifierProvider(create: (context) => BottomNavigationProvider()),
+    ChangeNotifierProvider(create: (context) => SearchModel())
   ], child: const MyApp()));
 }
 

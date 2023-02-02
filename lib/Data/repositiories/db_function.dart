@@ -27,7 +27,7 @@ ValueNotifier<List<Categoryawise>> categoryExpenseWiseTotalAmount =
 //=================================================================
 //======================value add when call categoryFilter()===================================
 //category name & transaction which under name
-ValueNotifier<Map<String, List<Transaction>>> map = ValueNotifier({});
+//ValueNotifier<Map<String, List<Transaction>>> map = ValueNotifier({});
 //===============================================================
 ValueNotifier<List<Categoryawise>> datewiseplanner = ValueNotifier([]);
 
@@ -278,34 +278,34 @@ class Categoryawise {
 
 //function for category
 //category name and under list of transaction
-categoryFilter() async {
-  map.value.clear();
+// categoryFilter() async {
+//   map.value.clear();
 
-  final box = Hive.box<Transaction>('transaction').values.toList();
-//create map
-//category name and transaction list which under that category
-  for (var categoryname in categoryWiseTotalAmount.value) {
-    map.value[categoryname.category.categoryName] = box
-        .where((element) =>
-            categoryname.category.categoryName == element.category.categoryName)
-        .toList();
-    // for (var element in box) {
-    //   if (box.contains(categoryname.category.categoryName)) {
-    //     cat.add(element);
-    //     print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-    //   } else {
-    //     print(
-    //         "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
+//   final box = Hive.box<Transaction>('transaction').values.toList();
+// //create map
+// //category name and transaction list which under that category
+//   for (var categoryname in categoryWiseTotalAmount.value) {
+//     map.value[categoryname.category.categoryName] = box
+//         .where((element) =>
+//             categoryname.category.categoryName == element.category.categoryName)
+//         .toList();
+//     // for (var element in box) {
+//     //   if (box.contains(categoryname.category.categoryName)) {
+//     //     cat.add(element);
+//     //     print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+//     //   } else {
+//     //     print(
+//     //         "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
 
-    //   }
-    // }
+//     //   }
+//     // }
 
-    // map.value[categoryname.category.categoryName] = cat;
-    // print(cat.length);
-    // categorywiseList.value.add(cat);
-    // categorywiseList.notifyListeners();
-  }
-}
+//     // map.value[categoryname.category.categoryName] = cat;
+//     // print(cat.length);
+//     // categorywiseList.value.add(cat);
+//     // categorywiseList.notifyListeners();
+//   }
+// }
 
 //exp
 analysisData(

@@ -1,5 +1,7 @@
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../Data/repositiories/db_function.dart';
 
@@ -13,12 +15,14 @@ class CategoryListScreen extends StatefulWidget {
 class _CategoryListScreenState extends State<CategoryListScreen> {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: map,
-      builder: (context, value, child) => ListView.separated(
+    Provider.of<TransactionModel>(context).categoryFilter();
+
+    return Consumer<TransactionModel>(
+      builder: (context, transactionModel, child) => ListView.separated(
           itemBuilder: (context, index) {
-            var categoryname = value.keys.elementAt(index);
-            var transactionUnderCategory = map.value.values.elementAt(index);
+            var categoryname = transactionModel.map.keys.elementAt(index);
+            var transactionUnderCategory =
+                transactionModel.map.values.elementAt(index);
             double total = 0;
             for (var element in transactionUnderCategory) {
               total += element.amount;
@@ -91,7 +95,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
           separatorBuilder: (context, index) => const SizedBox(
                 height: 20,
               ),
-          itemCount: map.value.length),
+          itemCount: transactionModel.map.length),
     );
   }
 }

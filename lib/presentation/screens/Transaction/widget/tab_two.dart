@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
-import '../../../../Data/repositiories/db_function.dart';
+
 import '../../../../custom WIDGETS/custom_text.dart';
 import '../../../../custom WIDGETS/custom_textInput.dart';
 
@@ -47,7 +47,9 @@ class TabTwo extends StatelessWidget {
                             onPressed: () {
                               value.incomeList[index].delete();
                               value.notifyListeners();
-                              categoryFilter();
+                              Provider.of<TransactionModel>(context,
+                                      listen: false)
+                                  .categoryFilter();
                             },
                             icon: const Icon(Icons.delete))
                       ]),
@@ -156,8 +158,9 @@ class TabTwo extends StatelessWidget {
                                     value.incomeList[index].note = note.text;
                                     value.incomeList[index].save();
                                     value.notifyListeners();
-                                    //value.incomeList.notifyListeners();
-                                    categoryFilter();
+                                    Provider.of<TransactionModel>(context,
+                                            listen: false)
+                                        .categoryFilter();
                                   },
                                   child: CustomText(
                                     content: "Edit",

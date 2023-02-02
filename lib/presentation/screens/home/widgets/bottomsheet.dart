@@ -1,10 +1,9 @@
+import 'package:expenztracker/business_logic/search_provider.dart';
 import 'package:expenztracker/custom%20WIDGETS/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
-
-ValueNotifier<CategoryType?> filterSelectedType = ValueNotifier(null);
-ValueNotifier<DateTimeRange?> selectedDateRange = ValueNotifier(null);
 
 bottomShet(BuildContext context) {
   // date function
@@ -19,8 +18,11 @@ bottomShet(BuildContext context) {
         firstDate: DateTime(2000),
         lastDate: DateTime(2050));
 
-    selectedDateRange.value = selectedDate;
-    selectedDateRange.notifyListeners();
+    Provider.of<SearchModel>(context, listen: false).selectedTimeRange =
+        selectedDate;
+
+    Provider.of<SearchModel>(context, listen: false).notifyListeners();
+    // print(Provider.of<SearchModel>(context, listen: false).selectedTimeRange);
   }
   //================================================
 
@@ -56,12 +58,11 @@ bottomShet(BuildContext context) {
                           borderRadius: BorderRadius.circular(30)),
                       width: 150,
                       height: 40,
-                      child: ValueListenableBuilder(
-                        valueListenable: filterSelectedType,
-                        builder: (context, value, child) => Padding(
+                      child: Consumer<SearchModel>(
+                        builder: (context, searchmdl, child) => Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: DropdownButton(
-                            value: filterSelectedType.value,
+                            value: searchmdl.selectedCategory,
                             itemHeight: 50,
                             icon: const Padding(
                               padding: EdgeInsets.only(left: 10),
@@ -84,8 +85,10 @@ bottomShet(BuildContext context) {
                               )
                             ],
                             onChanged: (value) {
-                              filterSelectedType.value = value;
-                              filterSelectedType.notifyListeners();
+                              Provider.of<SearchModel>(context, listen: false)
+                                  .selectedCategory = value;
+                              Provider.of<SearchModel>(context, listen: false)
+                                  .notifyListeners();
                             },
                           ),
                         ),
@@ -101,8 +104,7 @@ bottomShet(BuildContext context) {
               ),
               SizedBox(
                 width: 400,
-                child: ValueListenableBuilder(
-                  valueListenable: selectedDateRange,
+                child: Consumer<SearchModel>(
                   builder: (context, value, child) => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -115,9 +117,9 @@ bottomShet(BuildContext context) {
                               datepick();
                             },
                             child: CustomText(
-                              content: selectedDateRange.value == null
+                              content: value.selectedTimeRange == null
                                   ? 'Start'
-                                  : '${selectedDateRange.value!.start.day}-${selectedDateRange.value!.start.month}-${selectedDateRange.value!.start.year}',
+                                  : '${value.selectedTimeRange!.start.day}-${value.selectedTimeRange!.start.month}-${value.selectedTimeRange!.start.year}',
                             )),
                       ),
                       const SizedBox(
@@ -132,9 +134,9 @@ bottomShet(BuildContext context) {
                             datepick();
                           },
                           child: CustomText(
-                            content: selectedDateRange.value == null
+                            content: value.selectedTimeRange == null
                                 ? 'End'
-                                : '${selectedDateRange.value!.end.day}-${selectedDateRange.value!.end.month}-${selectedDateRange.value!.end.year}',
+                                : '${value.selectedTimeRange!.end.day}-${value.selectedTimeRange!.end.month}-${value.selectedTimeRange!.end.year}',
                           ),
                         ),
                       ),

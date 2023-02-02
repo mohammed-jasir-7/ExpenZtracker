@@ -28,14 +28,7 @@ class _CustomTextfiledState extends State<CustomTextfiled> {
   Widget build(BuildContext context) {
     return TextFormField(
       inputFormatters: widget.limit,
-      decoration: InputDecoration(
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.green),
-        ),
-        focusColor: Colors.green,
-        prefixIcon: Icon(widget.icon),
-        hintText: widget.hint,
-      ),
+      decoration: InputDecoration(hintText: "add note"),
       controller: widget.controller,
       style: TextStyle(color: widget.color),
       validator: (value) {

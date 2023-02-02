@@ -1,12 +1,15 @@
 import 'dart:developer';
 
+import 'package:expenztracker/business_logic/transaction_provider.dart';
 import 'package:expenztracker/presentation/screens/home/widgets/bottomsheet.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../Data/Model/model_transaction.dart';
 import '../../../../Data/repositiories/db_function.dart';
+import '../../../../business_logic/search_provider.dart';
 import '../../../../custom WIDGETS/custom_text.dart';
 
 import 'all_list_transaction.dart';
@@ -87,6 +90,11 @@ class MysearchDelegate extends SearchDelegate {
         IconButton(
             onPressed: () {
               if (query.isEmpty) {
+                Provider.of<SearchModel>(context, listen: false)
+                    .selectedTimeRange = null;
+                Provider.of<SearchModel>(context, listen: false)
+                    .selectedCategory = null;
+
                 close(context, null);
               } else {
                 query = '';
@@ -97,7 +105,14 @@ class MysearchDelegate extends SearchDelegate {
 
   @override
   Widget? buildLeading(BuildContext context) => IconButton(
-      onPressed: () => close(context, null),
+      onPressed: () {
+        Provider.of<SearchModel>(context, listen: false).selectedTimeRange =
+            null;
+        Provider.of<SearchModel>(context, listen: false).selectedCategory =
+            null;
+
+        close(context, null);
+      },
       icon: const Icon(Icons.arrow_back));
 
   @override
@@ -191,7 +206,11 @@ class MysearchDelegate extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (query.isNotEmpty) {
-        List<Transaction> get = searchFilter(query);
+        Provider.of<SearchModel>(context, listen: false).allTransactionList =
+            Provider.of<TransactionModel>(context, listen: false).allList;
+
+        List<Transaction> get = Provider.of<SearchModel>(context, listen: false)
+            .searchFilter(query);
         transaction.value.clear();
         transaction.value.addAll(get);
         transaction.notifyListeners();
@@ -284,42 +303,4 @@ class MysearchDelegate extends SearchDelegate {
             ),
           );
   }
-}
-
-List<Transaction> searchFilter(String query) {
-  print("hhhS${filterSelectedType.value}");
-  List<Transaction> transaction = Boxes.getTransaction().values.toList();
-  List<Transaction> filterd = transaction.where(
-    (element) {
-      if (filterSelectedType.value == null && selectedDateRange.value == null) {
-        return element.category.categoryName
-                .toLowerCase()
-                .contains(query.toLowerCase()) ||
-            element.note.toLowerCase().contains(query.toLowerCase());
-      } else if (filterSelectedType.value != null) {
-        if (selectedDateRange.value != null) {
-          if (element.date.isAfter(selectedDateRange.value!.start) &&
-              element.date.isBefore(selectedDateRange.value!.end) &&
-              filterSelectedType.value == element.categoryType) {
-            return element.category.categoryName
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) ||
-                element.note.toLowerCase().contains(query.toLowerCase());
-          }
-        } else {
-          return element.categoryType == filterSelectedType.value;
-        }
-      } else if (element.date.isAfter(selectedDateRange.value!.start) &&
-          element.date.isBefore(selectedDateRange.value!.end)) {
-        log("ccccccc");
-        return element.category.categoryName
-                .toLowerCase()
-                .contains(query.toLowerCase()) ||
-            element.note.toLowerCase().contains(query.toLowerCase());
-      }
-      return false;
-    },
-  ).toList();
-
-  return filterd;
 }
